@@ -1,0 +1,127 @@
+openapi: 3.0.0
+info:
+  title: Todo API - example
+  version: 1.0.0
+tags:
+- name: Todos
+  description: Manage todos.
+servers:
+- url: http://127.0.0.1:8080/
+paths:
+  /todos:
+    get:
+      tags:
+      - Todos
+      operationId: listTodos
+      responses:
+        200:
+          $ref: '#/components/responses/TodoListResponse'
+    post:
+      tags:
+      - Todos
+      operationId: createTodo
+      requestBody:
+        $ref: '#/components/requestBodies/TodoRequestBody'
+      responses:
+        201:
+          $ref: '#/components/responses/TodoResponse'
+  /todos/{todoId}:
+    get:
+      tags:
+      - Todos
+      operationId: getTodo
+      parameters:
+      - $ref: '#/components/parameters/TodoIdParameter'
+      responses:
+        200:
+          $ref: '#/components/responses/TodoResponse'
+    put:
+      tags:
+      - Todos
+      operationId: updateTodo
+      parameters:
+      - $ref: '#/components/parameters/TodoIdParameter'
+      requestBody:
+        $ref: '#/components/requestBodies/TodoRequestBody'
+      responses:
+        200:
+          $ref: '#/components/responses/TodoResponse'
+    delete:
+      tags:
+      - Todos
+      operationId: deleteTodo
+      parameters:
+      - $ref: '#/components/parameters/TodoIdParameter'
+      responses:
+        204:
+          description: Todo deleted
+          headers: {}
+components:
+  schemas:
+    TodoSchema:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/TodoIdField'
+        name:
+          $ref: '#/components/schemas/TodoNameField'
+        isCompleted:
+          $ref: '#/components/schemas/TodoIsCompletedField'
+      required:
+      - id
+      - name
+      - isCompleted
+    TodoIdField:
+      type: string
+      default: null
+      example: 8tQ2mP1xV6nC
+    TodoNameField:
+      type: string
+      default: null
+      example: Buy groceries
+    TodoIsCompletedField:
+      type: boolean
+      default: null
+      example: false
+    TodoCreateSchema:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/TodoNameField'
+        isCompleted:
+          $ref: '#/components/schemas/TodoIsCompletedField'
+      required:
+      - name
+      - isCompleted
+  responses:
+    TodoListResponse:
+      description: Todo list response
+      headers: {}
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/TodoSchema'
+    TodoResponse:
+      description: Todo response
+      headers: {}
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TodoSchema'
+  parameters:
+    TodoIdParameter:
+      name: todoId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/TodoIdField'
+      description: Todo identifier
+  requestBodies:
+    TodoRequestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TodoCreateSchema'
+      required: true

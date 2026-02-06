@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API documentation</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="./swagger-ui/swagger-ui.min.css" rel="stylesheet">
+</head>
+<body onload="render()">
+    <div id="swagger-ui"></div>
+    <script src="./swagger-ui/swagger-ui-bundle.min.js"></script>
+    <script>
+        function render() {
+            var ui = SwaggerUIBundle({
+                url: './openapi.yaml',
+                dom_id: '#swagger-ui',
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIBundle.SwaggerUIStandalonePreset,
+                ]
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+.DS_Store
+.build
+.swiftpm
+/end-to-end-openapi-postgres-hummingbird/example-openapi/.swift-openapi-generator/
