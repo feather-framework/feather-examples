@@ -1,36 +1,86 @@
-//import Logging
+import Configuration
+import Logging
+import PostgresNIO
+import FeatherDatabase
+import FeatherPostgresDatabase
+import SystemPackage
+import Foundation
 
 @main
 struct Entrypoint {
     
     static func main() async throws {
-        print("hello world")
-//        try await db.withConnection { connection in
-//            // 1) Table creation
-//            try await connection.run(query: #"""
-//                CREATE TABLE IF NOT EXISTS "contact_messages" (
-//                    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-//                    "name" TEXT NOT NULL,
-//                    "email" TEXT NOT NULL,
-//                    "phone" TEXT NOT NULL,
-//                    "message" TEXT NOT NULL,
-//                    "created_at" TEXT NOT NULL
-//                );
-//                """#)
-//
-//            // 2) Dummy seed data (idempotent)
-//            try await connection.run(query: #"""
-//                INSERT INTO contact_messages (name, email, phone, message, created_at)
-//                SELECT
-//                    'John Doe',
-//                    'john.doe@example.com',
-//                    '+36 30 123 4567',
-//                    'This is a dummy contact message.',
-//                    datetime('now')
-//                WHERE NOT EXISTS (
-//                    SELECT 1 FROM contact_messages
-//                );
-//                """#)
-//        }
+        let reader = try await ConfigReader(
+            providers: [
+                CommandLineArgumentsProvider(),
+                EnvironmentVariablesProvider(),
+                EnvironmentVariablesProvider(
+                    environmentFilePath: ".env",
+                    allowMissing: true
+                ),
+                InMemoryProvider(values: [
+                    :
+                ])
+            ]
+        )
+
+        let logger = {
+            var logger = Logger(label: "example-migrator")
+            logger.logLevel = reader.string(
+                forKey: "log.level",
+                as: Logger.Level.self,
+                default: .info
+            )
+            return logger
+        }()
+        
+        let finalCertPath = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: "docker")
+            .appending(path: "postgres")
+            .appending(path: "certificates")
+            .appending(path: "ca.pem")
+            .path()
+
+        var tlsConfig = TLSConfiguration.makeClientConfiguration()
+        let rootCert = try NIOSSLCertificate.fromPEMFile(finalCertPath)
+        tlsConfig.trustRoots = .certificates(rootCert)
+        tlsConfig.certificateVerification = .fullVerification
+
+        let client = PostgresClient(
+            configuration: .init(
+                host: "127.0.0.1",
+                port: 5432,
+                username: "postgres",
+                password: "postgres",
+                database: "postgres",
+                tls: .require(tlsConfig)
+            ),
+            backgroundLogger: logger
+        )
+        
+        let database = PostgresDatabaseClient(
+            client: client,
+            logger: logger
+        )
+
+        let migrator = Migrator(
+            database: database
+        )
+
+        
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            group.addTask {
+                await client.run()
+            }
+            group.addTask {
+                try await migrator.run()
+                print("✅ Migration ready.")
+            }
+            try await group.next()
+            group.cancelAll()
+        }
     }
 }

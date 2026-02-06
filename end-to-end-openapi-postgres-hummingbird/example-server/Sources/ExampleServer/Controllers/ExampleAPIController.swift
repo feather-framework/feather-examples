@@ -56,6 +56,10 @@ struct ExampleAPIController: APIProtocol {
         }
 
         let todoId = NanoID().rawValue
+        
+        guard !payload.name.isEmpty else {
+            return .unprocessableContent(.init())
+        }
 
         return try await database.withConnection { connection in
             try await connection.run(
@@ -69,7 +73,7 @@ struct ExampleAPIController: APIProtocol {
                     """#
             ) { sequence in
                 guard let row = try await sequence.collect().first else {
-                    fatalError()
+                    return .notFound(.init())
                 }
                 let todo = try Components.Schemas.TodoSchema.decode(from: row)
 
@@ -94,7 +98,7 @@ struct ExampleAPIController: APIProtocol {
                     """#
             ) { sequence in
                 guard let row = try await sequence.collect().first else {
-                    fatalError()
+                    return .notFound(.init())
                 }
                 let todo = try Components.Schemas.TodoSchema.decode(from: row)
 
@@ -116,6 +120,10 @@ struct ExampleAPIController: APIProtocol {
         case let .json(value):
             payload = value
         }
+        
+        guard !payload.name.isEmpty else {
+            return .unprocessableContent(.init())
+        }
 
         return try await database.withConnection { connection in
             try await connection.run(
@@ -132,7 +140,7 @@ struct ExampleAPIController: APIProtocol {
                     """#
             ) { sequence in
                 guard let row = try await sequence.collect().first else {
-                    fatalError()
+                    return .notFound(.init())
                 }
                 let todo = try Components.Schemas.TodoSchema.decode(from: row)
 

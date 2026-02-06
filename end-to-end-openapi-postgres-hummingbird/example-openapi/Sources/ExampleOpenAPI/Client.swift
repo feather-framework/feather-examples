@@ -83,6 +83,10 @@ public struct Client: APIProtocol {
                         preconditionFailure("bestContentType chose an invalid content type.")
                     }
                     return .ok(.init(body: body))
+                case 400:
+                    return .badRequest(.init())
+                case 422:
+                    return .unprocessableContent(.init())
                 default:
                     return .undocumented(
                         statusCode: response.status.code,
@@ -150,6 +154,12 @@ public struct Client: APIProtocol {
                         preconditionFailure("bestContentType chose an invalid content type.")
                     }
                     return .created(.init(body: body))
+                case 400:
+                    return .badRequest(.init())
+                case 422:
+                    return .unprocessableContent(.init())
+                case 404:
+                    return .notFound(.init())
                 default:
                     return .undocumented(
                         statusCode: response.status.code,
@@ -210,6 +220,12 @@ public struct Client: APIProtocol {
                         preconditionFailure("bestContentType chose an invalid content type.")
                     }
                     return .ok(.init(body: body))
+                case 400:
+                    return .badRequest(.init())
+                case 404:
+                    return .notFound(.init())
+                case 422:
+                    return .unprocessableContent(.init())
                 default:
                     return .undocumented(
                         statusCode: response.status.code,
@@ -279,6 +295,12 @@ public struct Client: APIProtocol {
                         preconditionFailure("bestContentType chose an invalid content type.")
                     }
                     return .ok(.init(body: body))
+                case 400:
+                    return .badRequest(.init())
+                case 404:
+                    return .notFound(.init())
+                case 422:
+                    return .unprocessableContent(.init())
                 default:
                     return .undocumented(
                         statusCode: response.status.code,
@@ -315,6 +337,8 @@ public struct Client: APIProtocol {
                 switch response.status.code {
                 case 204:
                     return .noContent(.init())
+                case 404:
+                    return .notFound(.init())
                 default:
                     return .undocumented(
                         statusCode: response.status.code,

@@ -14,7 +14,10 @@ struct TodoCreateOperation: OperationRepresentable {
     var requestBody: RequestBodyRepresentable? { TodoRequestBody().reference() }
     var responseMap: ResponseMap {
         [
-            201: TodoResponse().reference()
+            201: TodoResponse().reference(),
+            400: BadInputResponse().reference(),
+            422: UnprocessableEntityResponse().reference(),
+            404: NotFoundResponse().reference(),
         ]
     }
 }
@@ -24,7 +27,9 @@ struct TodoListOperation: OperationRepresentable {
     var operationId: String? { "listTodos" }
     var responseMap: ResponseMap {
         [
-            200: TodoListResponse().reference()
+            200: TodoListResponse().reference(),
+            400: BadInputResponse().reference(),
+            422: UnprocessableEntityResponse().reference(),
         ]
     }
 }
@@ -37,7 +42,10 @@ struct TodoGetOperation: OperationRepresentable {
     }
     var responseMap: ResponseMap {
         [
-            200: TodoResponse().reference()
+            200: TodoResponse().reference(),
+            400: BadInputResponse().reference(),
+            404: NotFoundResponse().reference(),
+            422: UnprocessableEntityResponse().reference(),
         ]
     }
 }
@@ -51,7 +59,10 @@ struct TodoUpdateOperation: OperationRepresentable {
     var requestBody: RequestBodyRepresentable? { TodoRequestBody().reference() }
     var responseMap: ResponseMap {
         [
-            200: TodoResponse().reference()
+            200: TodoResponse().reference(),
+            400: BadInputResponse().reference(),
+            404: NotFoundResponse().reference(),
+            422: UnprocessableEntityResponse().reference(),
         ]
     }
 }
@@ -64,7 +75,8 @@ struct TodoDeleteOperation: OperationRepresentable {
     }
     var responseMap: ResponseMap {
         [
-            204: EmptyResponse(description: "Todo deleted")
+            204: EmptyResponse(description: "Todo deleted"),
+            404: NotFoundResponse().reference(),
         ]
     }
 }

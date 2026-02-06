@@ -128,6 +128,16 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                         )
                     }
                     return (response, body)
+                case let .badRequest(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 400)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .unprocessableContent(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 422)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
                 case let .undocumented(statusCode, _):
                     return (.init(soar_statusCode: statusCode), nil)
                 }
@@ -196,6 +206,21 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                         )
                     }
                     return (response, body)
+                case let .badRequest(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 400)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .unprocessableContent(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 422)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .notFound(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 404)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
                 case let .undocumented(statusCode, _):
                     return (.init(soar_statusCode: statusCode), nil)
                 }
@@ -249,6 +274,21 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                         )
                     }
                     return (response, body)
+                case let .badRequest(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 400)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .notFound(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 404)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .unprocessableContent(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 422)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
                 case let .undocumented(statusCode, _):
                     return (.init(soar_statusCode: statusCode), nil)
                 }
@@ -323,6 +363,21 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                         )
                     }
                     return (response, body)
+                case let .badRequest(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 400)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .notFound(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 404)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .unprocessableContent(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 422)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
                 case let .undocumented(statusCode, _):
                     return (.init(soar_statusCode: statusCode), nil)
                 }
@@ -357,6 +412,11 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 case let .noContent(value):
                     suppressUnusedWarning(value)
                     var response = HTTPTypes.HTTPResponse(soar_statusCode: 204)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .notFound(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 404)
                     suppressMutabilityWarning(&response)
                     return (response, nil)
                 case let .undocumented(statusCode, _):

@@ -16,6 +16,10 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/TodoListResponse'
+        400:
+          $ref: '#/components/responses/BadInputResponse'
+        422:
+          $ref: '#/components/responses/UnprocessableEntityResponse'
     post:
       tags:
       - Todos
@@ -25,6 +29,12 @@ paths:
       responses:
         201:
           $ref: '#/components/responses/TodoResponse'
+        400:
+          $ref: '#/components/responses/BadInputResponse'
+        422:
+          $ref: '#/components/responses/UnprocessableEntityResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
   /todos/{todoId}:
     get:
       tags:
@@ -35,6 +45,12 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/TodoResponse'
+        400:
+          $ref: '#/components/responses/BadInputResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+        422:
+          $ref: '#/components/responses/UnprocessableEntityResponse'
     put:
       tags:
       - Todos
@@ -46,6 +62,12 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/TodoResponse'
+        400:
+          $ref: '#/components/responses/BadInputResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+        422:
+          $ref: '#/components/responses/UnprocessableEntityResponse'
     delete:
       tags:
       - Todos
@@ -56,6 +78,8 @@ paths:
         204:
           description: Todo deleted
           headers: {}
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
 components:
   schemas:
     TodoSchema:
@@ -110,6 +134,12 @@ components:
               $ref: '#/components/schemas/TodoSchema'
             minItems: 0
             uniqueItems: false
+    BadInputResponse:
+      description: Bad input
+      headers: {}
+    UnprocessableEntityResponse:
+      description: Unprocessable entity
+      headers: {}
     TodoResponse:
       description: Todo response
       headers: {}
@@ -117,6 +147,9 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/TodoSchema'
+    NotFoundResponse:
+      description: Todo not found
+      headers: {}
   parameters:
     TodoIdParameter:
       name: todoId

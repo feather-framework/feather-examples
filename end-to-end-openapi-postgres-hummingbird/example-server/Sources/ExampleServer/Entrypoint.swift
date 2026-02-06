@@ -16,7 +16,7 @@ struct Entrypoint {
                     allowMissing: true
                 ),
                 InMemoryProvider(values: [
-                    "http.serverName": "dental-wiz-app"
+                    :
                 ])
             ]
         )

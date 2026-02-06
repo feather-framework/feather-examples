@@ -12,16 +12,34 @@ func buildRouter(
 
     router.addMiddleware {
         LogRequestsMiddleware(.info)
+        CORSMiddleware(
+            allowOrigin: .originBased,
+            allowHeaders: [
+                .accept,
+                .authorization,
+                .contentType,
+                .origin,
+            ],
+            allowMethods: [
+                .get,
+                .post,
+                .delete,
+                .patch,
+                .put,
+            ],
+        )
     }
-    
-    router.get("/") { _, _ in
-        "Hello, World!"
+
+    router.get("/health") { _, _ in
+        Response(status: .ok)
     }
     
     let controller = ExampleAPIController(
         database: database
     )
-    try controller.registerHandlers(on: router)
+    try controller.registerHandlers(
+        on: router,
+    )
     
     return router
 }

@@ -81,6 +81,8 @@ let package = Package(
         .executableTarget(
             name: "ExampleMigrator",
             dependencies: [
+                .product(name: "Configuration", package: "swift-configuration"),
+                .product(name: "FeatherPostgresDatabase", package: "feather-postgres-database"),
             ],
             swiftSettings: defaultSwiftSettings
         ),
