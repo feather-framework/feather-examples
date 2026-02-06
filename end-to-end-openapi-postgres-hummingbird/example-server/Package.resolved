@@ -1,5 +1,5 @@
 {
-  "originHash" : "011b8df78687426d6bb82e923a117fd2b206129326486bd9ffef3c9b3a5ead64",
+  "originHash" : "f650851b5f3d5d09853c2d121532ad0ebf8cc0c9a20983c421260da6b0cc9dde",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -161,6 +161,15 @@
       "state" : {
         "revision" : "0743a9364382629da3bf5677b46a2c4b1ce5d2a6",
         "version" : "2.7.1"
+      }
+    },
+    {
+      "identity" : "swift-nanoid",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/BinaryBirds/swift-nanoid",
+      "state" : {
+        "revision" : "cb73f19b3a25cc5aa14512fa43b08f2ff63002db",
+        "version" : "1.1.1"
       }
     },
     {

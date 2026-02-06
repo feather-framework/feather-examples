@@ -2,6 +2,21 @@ import Hummingbird
 import ExampleOpenAPI
 import FeatherDatabase
 import FeatherPostgresDatabase
+import Foundation
+import NanoID
+
+private extension Components.Schemas.TodoSchema {
+
+    static func decode(
+        from row: PostgresDatabaseRow
+    ) throws -> Self {
+        try .init(
+            id: row.decode(column: "id", as: String.self),
+            name: row.decode(column: "name", as: String.self),
+            isCompleted: row.decode(column: "is_completed", as: Bool.self)
+        )
+    }
+}
 
 struct ExampleAPIController: APIProtocol {
     
@@ -13,28 +28,17 @@ struct ExampleAPIController: APIProtocol {
         try await database.withConnection { connection in
             try await connection.run(
                 query: #"""
-                    SELECT
-                        version() AS "version"
-                    WHERE
-                        1=\#(1);
+                    SELECT * FROM todos ORDER BY id;
                     """#
             ) { sequence in
-                let result = try await sequence.collect()
-                let version = try result[0].decode(
-                    column: "version",
-                    as: String.self
-                )
-
+                let rows = try await sequence.collect()
+                let todos = try rows.map { row in
+                    try Components.Schemas.TodoSchema.decode(from: row)
+                }
                 return .ok(
                     .init(
                         body: .json(
-                            [
-                                .init(
-                                    id: "foo",
-                                    name: "\(version)",
-                                    isCompleted: false
-                                ),
-                            ]
+                            todos
                         )
                     )
                 )
@@ -45,24 +49,115 @@ struct ExampleAPIController: APIProtocol {
     func createTodo(
         _ input: Operations.CreateTodo.Input
     ) async throws -> Operations.CreateTodo.Output {
-        fatalError()
+        let payload: Components.Schemas.TodoCreateSchema
+        switch input.body {
+        case let .json(value):
+            payload = value
+        }
+
+        let todoId = NanoID().rawValue
+
+        return try await database.withConnection { connection in
+            try await connection.run(
+                query: #"""
+                    INSERT INTO 
+                        todos (id, name, is_completed)
+                    VALUES 
+                        (\#(todoId), \#(payload.name), \#(payload.isCompleted))
+                    RETURNING
+                        *;
+                    """#
+            ) { sequence in
+                guard let row = try await sequence.collect().first else {
+                    fatalError()
+                }
+                let todo = try Components.Schemas.TodoSchema.decode(from: row)
+
+                return .created(
+                    .init(
+                        body: .json(todo)
+                    )
+                )
+            }
+        }
     }
     
     func getTodo(
         _ input: Operations.GetTodo.Input
     ) async throws -> Operations.GetTodo.Output {
-        fatalError()
+        let todoId = input.path.todoId
+
+        return try await database.withConnection { connection in
+            try await connection.run(
+                query: #"""
+                    SELECT * FROM todos WHERE id=\#(todoId) LIMIT 1;
+                    """#
+            ) { sequence in
+                guard let row = try await sequence.collect().first else {
+                    fatalError()
+                }
+                let todo = try Components.Schemas.TodoSchema.decode(from: row)
+
+                return .ok(
+                    .init(
+                        body: .json(todo)
+                    )
+                )
+            }
+        }
     }
 
     func updateTodo(
         _ input: Operations.UpdateTodo.Input
     ) async throws -> Operations.UpdateTodo.Output {
-        fatalError()
+        let todoId = input.path.todoId
+        let payload: Components.Schemas.TodoCreateSchema
+        switch input.body {
+        case let .json(value):
+            payload = value
+        }
+
+        return try await database.withConnection { connection in
+            try await connection.run(
+                query: #"""
+                    UPDATE 
+                        todos 
+                    SET
+                        name=\#(payload.name),
+                        is_completed=\#(payload.isCompleted)
+                    WHERE
+                        id=\#(todoId)
+                    RETURNING
+                        *;
+                    """#
+            ) { sequence in
+                guard let row = try await sequence.collect().first else {
+                    fatalError()
+                }
+                let todo = try Components.Schemas.TodoSchema.decode(from: row)
+
+                return .ok(
+                    .init(
+                        body: .json(todo)
+                    )
+                )
+            }
+        }
     }
     
     func deleteTodo(
         _ input: Operations.DeleteTodo.Input
     ) async throws -> Operations.DeleteTodo.Output {
-        fatalError()
+        let todoId = input.path.todoId
+
+        return try await database.withConnection { connection in
+            try await connection.run(
+                query: #"""
+                    DELETE FROM todos WHERE id=\#(todoId);
+                    """#
+            ) { _ in
+                return .noContent
+            }
+        }
     }
 }

@@ -58,7 +58,11 @@ let package = Package(
         .package(
             url: "https://github.com/feather-framework/feather-postgres-database",
             exact: "1.0.0-beta.2"
-        ),        
+        ),
+        .package(
+            url: "https://github.com/BinaryBirds/swift-nanoid",
+            from: "1.0.0"
+        ),
         .package(path: "../example-openapi"),
     ],
     targets: [
@@ -68,7 +72,8 @@ let package = Package(
                 .product(name: "Configuration", package: "swift-configuration"),
                 .product(name: "Hummingbird", package: "hummingbird"),
                 .product(name: "OpenAPIHummingbird", package: "swift-openapi-hummingbird"),
-                    .product(name: "FeatherPostgresDatabase", package: "feather-postgres-database"),
+                .product(name: "NanoID", package: "swift-nanoid"),
+                .product(name: "FeatherPostgresDatabase", package: "feather-postgres-database"),
                 .product(name: "ExampleOpenAPI", package: "example-openapi"),
             ],
             swiftSettings: defaultSwiftSettings
