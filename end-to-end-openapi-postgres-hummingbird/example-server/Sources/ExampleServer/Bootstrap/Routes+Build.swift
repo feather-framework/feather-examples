@@ -2,9 +2,11 @@ import Hummingbird
 import OpenAPIHummingbird
 import Logging
 import ExampleOpenAPI
+import FeatherDatabase
+import FeatherPostgresDatabase
 
 func buildRouter(
-//    db: SQLiteDatabaseClient
+    database: PostgresDatabaseClient
 ) throws -> Router<AppRequestContext> {
     let router = Router(context: AppRequestContext.self)
 
@@ -16,7 +18,9 @@ func buildRouter(
         "Hello, World!"
     }
     
-    let controller = ExampleAPIController()
+    let controller = ExampleAPIController(
+        database: database
+    )
     try controller.registerHandlers(on: router)
     
     return router

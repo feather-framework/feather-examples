@@ -1,20 +1,45 @@
 import Hummingbird
 import ExampleOpenAPI
+import FeatherDatabase
+import FeatherPostgresDatabase
 
 struct ExampleAPIController: APIProtocol {
+    
+    var database: PostgresDatabaseClient
 
     func listTodos(
         _ input: Operations.ListTodos.Input
     ) async throws -> Operations.ListTodos.Output {
-        .ok(
-            .init(
-                body: .json(
-                    [
-                        .init(id: "foo", name: "bar", isCompleted: false),
-                    ]
+        try await database.withConnection { connection in
+            try await connection.run(
+                query: #"""
+                    SELECT
+                        version() AS "version"
+                    WHERE
+                        1=\#(1);
+                    """#
+            ) { sequence in
+                let result = try await sequence.collect()
+                let version = try result[0].decode(
+                    column: "version",
+                    as: String.self
                 )
-            )
-        )
+
+                return .ok(
+                    .init(
+                        body: .json(
+                            [
+                                .init(
+                                    id: "foo",
+                                    name: "\(version)",
+                                    isCompleted: false
+                                ),
+                            ]
+                        )
+                    )
+                )
+            }
+        }
     }
     
     func createTodo(

@@ -1,5 +1,5 @@
 {
-  "originHash" : "753eb77e79e803c3c4796f74af347dd01137a94cff25d876777a429e64443aa7",
+  "originHash" : "011b8df78687426d6bb82e923a117fd2b206129326486bd9ffef3c9b3a5ead64",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -11,12 +11,39 @@
       }
     },
     {
+      "identity" : "feather-database",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/feather-framework/feather-database",
+      "state" : {
+        "revision" : "4ef69e67018c4bdf843858e8976c13b97c3afe4c",
+        "version" : "1.0.0-beta.3"
+      }
+    },
+    {
+      "identity" : "feather-postgres-database",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/feather-framework/feather-postgres-database",
+      "state" : {
+        "revision" : "2c13bc815515a16a669abcf7fb6d7781b58876d1",
+        "version" : "1.0.0-beta.2"
+      }
+    },
+    {
       "identity" : "hummingbird",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hummingbird-project/hummingbird",
       "state" : {
         "revision" : "960fd08e28e1858e0896410e3a800ff80e112a80",
         "version" : "2.20.0"
+      }
+    },
+    {
+      "identity" : "postgres-nio",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/vapor/postgres-nio",
+      "state" : {
+        "revision" : "d578b86fb2c8321b114d97cd70831d1a3e9531a6",
+        "version" : "1.30.1"
       }
     },
     {

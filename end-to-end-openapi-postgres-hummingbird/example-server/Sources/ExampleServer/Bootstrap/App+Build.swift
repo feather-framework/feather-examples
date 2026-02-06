@@ -2,9 +2,10 @@ import Configuration
 import Hummingbird
 import Logging
 import ServiceLifecycle
-//import SQLiteNIO
-//import SQLiteNIOExtras
-//import FeatherSQLiteDatabase
+import PostgresNIO
+import FeatherDatabase
+import FeatherPostgresDatabase
+import Foundation
 
 typealias AppRequestContext = BasicRequestContext
 
@@ -22,10 +23,43 @@ func buildApplication(
         return logger
     }()
     
-//    let dbPath = reader.string(forKey: "db.path", default: "db.sqlite")
+    let finalCertPath = URL(fileURLWithPath: #filePath)
+        .deletingLastPathComponent()
+        .deletingLastPathComponent()
+        .deletingLastPathComponent()
+        .deletingLastPathComponent()
+        .appending(path: "docker")
+        .appending(path: "postgres")
+        .appending(path: "certificates")
+        .appending(path: "ca.pem")
+        .path()
 
-    let router = try buildRouter()
-    let app = Application(
+    var tlsConfig = TLSConfiguration.makeClientConfiguration()
+    let rootCert = try NIOSSLCertificate.fromPEMFile(finalCertPath)
+    tlsConfig.trustRoots = .certificates(rootCert)
+    tlsConfig.certificateVerification = .fullVerification
+
+    let client = PostgresClient(
+        configuration: .init(
+            host: "127.0.0.1",
+            port: 5432,
+            username: "postgres",
+            password: "postgres",
+            database: "postgres",
+            tls: .require(tlsConfig)
+        ),
+        backgroundLogger: logger
+    )
+
+    let database = PostgresDatabaseClient(
+        client: client,
+        logger: logger
+    )
+    
+    let router = try buildRouter(
+        database: database
+    )
+    var app = Application(
         router: router,
         configuration: ApplicationConfiguration(
             reader: reader.scoped(to: "http")
@@ -33,7 +67,7 @@ func buildApplication(
         logger: logger
     )
     
-//    app.addServices()
+    app.addServices(client)
     return app
 }
 

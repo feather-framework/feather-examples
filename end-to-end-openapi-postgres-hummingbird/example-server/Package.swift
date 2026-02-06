@@ -55,15 +55,10 @@ let package = Package(
             url: "https://github.com/hummingbird-project/swift-openapi-hummingbird",
             from: "2.0.1"
         ),
-//        .package(
-//            url: "https://github.com/feather-framework/feather-sqlite-database",
-//            exact: "1.0.0-beta.4",
-//            traits: [
-//                .defaults,
-//                "ServiceLifecycleSupport",
-//           ]
-//        ),
-        
+        .package(
+            url: "https://github.com/feather-framework/feather-postgres-database",
+            exact: "1.0.0-beta.2"
+        ),        
         .package(path: "../example-openapi"),
     ],
     targets: [
@@ -73,7 +68,7 @@ let package = Package(
                 .product(name: "Configuration", package: "swift-configuration"),
                 .product(name: "Hummingbird", package: "hummingbird"),
                 .product(name: "OpenAPIHummingbird", package: "swift-openapi-hummingbird"),
-//                    .product(name: "FeatherSQLiteDatabase", package: "feather-sqlite-database"),
+                    .product(name: "FeatherPostgresDatabase", package: "feather-postgres-database"),
                 .product(name: "ExampleOpenAPI", package: "example-openapi"),
             ],
             swiftSettings: defaultSwiftSettings
