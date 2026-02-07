@@ -93,4 +93,3 @@ yaml:
 
 docker:
 	@./docker/api/scripts/bootstrap.sh
-	@cp ./openapi/openapi.yaml ./docker/api/www/
