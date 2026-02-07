@@ -14,6 +14,8 @@ struct MyPathCollection: PathCollectionRepresentable {
         [
             "todos": TodoPathItems(),
             "todos/{todoId}": TodoIdPathItems(),
+            "lists": ListPathItems(),
+            "lists/{listId}": ListIdPathItems(),
         ]
     }
 }
@@ -62,4 +64,3 @@ struct Location: LocationRepresentable {
         self.location = location
     }
 }
-

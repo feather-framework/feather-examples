@@ -1,14 +1,13 @@
 import Hummingbird
 import ExampleOpenAPI
 import FeatherDatabase
-import FeatherPostgresDatabase
 import Foundation
 import NanoID
 
 private extension Components.Schemas.TodoSchema {
 
     static func decode(
-        from row: PostgresDatabaseRow
+        from row: DatabaseRow
     ) throws -> Self {
         try .init(
             id: row.decode(column: "id", as: String.self),
@@ -20,7 +19,7 @@ private extension Components.Schemas.TodoSchema {
 
 struct ExampleAPIController: APIProtocol {
     
-    var database: PostgresDatabaseClient
+    var database: any DatabaseClient
 
     func listTodos(
         _ input: Operations.ListTodos.Input
@@ -67,7 +66,7 @@ struct ExampleAPIController: APIProtocol {
                     INSERT INTO 
                         todos (id, name, is_completed)
                     VALUES 
-                        (\#(todoId), \#(payload.name), \#(payload.isCompleted))
+                        (\#(todoId), \#(payload.name), \#(String(payload.isCompleted))
                     RETURNING
                         *;
                     """#
@@ -132,7 +131,7 @@ struct ExampleAPIController: APIProtocol {
                         todos 
                     SET
                         name=\#(payload.name),
-                        is_completed=\#(payload.isCompleted)
+                        is_completed=\#(String(payload.isCompleted))
                     WHERE
                         id=\#(todoId)
                     RETURNING

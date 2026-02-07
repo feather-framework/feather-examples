@@ -26,6 +26,21 @@ public protocol APIProtocol: Sendable {
     /// - Remark: HTTP `DELETE /todos/{todoId}`.
     /// - Remark: Generated from `#/paths//todos/{todoId}/delete(deleteTodo)`.
     func deleteTodo(_ input: Operations.DeleteTodo.Input) async throws -> Operations.DeleteTodo.Output
+    /// - Remark: HTTP `GET /lists`.
+    /// - Remark: Generated from `#/paths//lists/get(listLists)`.
+    func listLists(_ input: Operations.ListLists.Input) async throws -> Operations.ListLists.Output
+    /// - Remark: HTTP `POST /lists`.
+    /// - Remark: Generated from `#/paths//lists/post(createList)`.
+    func createList(_ input: Operations.CreateList.Input) async throws -> Operations.CreateList.Output
+    /// - Remark: HTTP `GET /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/get(getList)`.
+    func getList(_ input: Operations.GetList.Input) async throws -> Operations.GetList.Output
+    /// - Remark: HTTP `PUT /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/put(updateList)`.
+    func updateList(_ input: Operations.UpdateList.Input) async throws -> Operations.UpdateList.Output
+    /// - Remark: HTTP `DELETE /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/delete(deleteList)`.
+    func deleteList(_ input: Operations.DeleteList.Input) async throws -> Operations.DeleteList.Output
 }
 
 /// Convenience overloads for operation inputs.
@@ -75,6 +90,51 @@ extension APIProtocol {
     public func deleteTodo(path: Operations.DeleteTodo.Input.Path) async throws -> Operations.DeleteTodo.Output {
         try await deleteTodo(Operations.DeleteTodo.Input(path: path))
     }
+    /// - Remark: HTTP `GET /lists`.
+    /// - Remark: Generated from `#/paths//lists/get(listLists)`.
+    public func listLists(headers: Operations.ListLists.Input.Headers = .init()) async throws -> Operations.ListLists.Output {
+        try await listLists(Operations.ListLists.Input(headers: headers))
+    }
+    /// - Remark: HTTP `POST /lists`.
+    /// - Remark: Generated from `#/paths//lists/post(createList)`.
+    public func createList(
+        headers: Operations.CreateList.Input.Headers = .init(),
+        body: Components.RequestBodies.ListRequestBody
+    ) async throws -> Operations.CreateList.Output {
+        try await createList(Operations.CreateList.Input(
+            headers: headers,
+            body: body
+        ))
+    }
+    /// - Remark: HTTP `GET /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/get(getList)`.
+    public func getList(
+        path: Operations.GetList.Input.Path,
+        headers: Operations.GetList.Input.Headers = .init()
+    ) async throws -> Operations.GetList.Output {
+        try await getList(Operations.GetList.Input(
+            path: path,
+            headers: headers
+        ))
+    }
+    /// - Remark: HTTP `PUT /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/put(updateList)`.
+    public func updateList(
+        path: Operations.UpdateList.Input.Path,
+        headers: Operations.UpdateList.Input.Headers = .init(),
+        body: Components.RequestBodies.ListRequestBody
+    ) async throws -> Operations.UpdateList.Output {
+        try await updateList(Operations.UpdateList.Input(
+            path: path,
+            headers: headers,
+            body: body
+        ))
+    }
+    /// - Remark: HTTP `DELETE /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/delete(deleteList)`.
+    public func deleteList(path: Operations.DeleteList.Input.Path) async throws -> Operations.DeleteList.Output {
+        try await deleteList(Operations.DeleteList.Input(path: path))
+    }
 }
 
 /// Server URLs defined in the OpenAPI document.
@@ -108,25 +168,31 @@ public enum Components {
             public var name: Components.Schemas.TodoNameField
             /// - Remark: Generated from `#/components/schemas/TodoSchema/isCompleted`.
             public var isCompleted: Components.Schemas.TodoIsCompletedField
+            /// - Remark: Generated from `#/components/schemas/TodoSchema/listId`.
+            public var listId: Components.Schemas.ListIdField
             /// Creates a new `TodoSchema`.
             ///
             /// - Parameters:
             ///   - id:
             ///   - name:
             ///   - isCompleted:
+            ///   - listId:
             public init(
                 id: Components.Schemas.TodoIdField,
                 name: Components.Schemas.TodoNameField,
-                isCompleted: Components.Schemas.TodoIsCompletedField
+                isCompleted: Components.Schemas.TodoIsCompletedField,
+                listId: Components.Schemas.ListIdField
             ) {
                 self.id = id
                 self.name = name
                 self.isCompleted = isCompleted
+                self.listId = listId
             }
             public enum CodingKeys: String, CodingKey {
                 case id
                 case name
                 case isCompleted
+                case listId
             }
         }
         /// - Remark: Generated from `#/components/schemas/TodoIdField`.
@@ -135,27 +201,75 @@ public enum Components {
         public typealias TodoNameField = Swift.String
         /// - Remark: Generated from `#/components/schemas/TodoIsCompletedField`.
         public typealias TodoIsCompletedField = Swift.Bool
+        /// - Remark: Generated from `#/components/schemas/ListIdField`.
+        public typealias ListIdField = Swift.String
         /// - Remark: Generated from `#/components/schemas/TodoCreateSchema`.
         public struct TodoCreateSchema: Codable, Hashable, Sendable {
             /// - Remark: Generated from `#/components/schemas/TodoCreateSchema/name`.
             public var name: Components.Schemas.TodoNameField
             /// - Remark: Generated from `#/components/schemas/TodoCreateSchema/isCompleted`.
             public var isCompleted: Components.Schemas.TodoIsCompletedField
+            /// - Remark: Generated from `#/components/schemas/TodoCreateSchema/listId`.
+            public var listId: Components.Schemas.ListIdField
             /// Creates a new `TodoCreateSchema`.
             ///
             /// - Parameters:
             ///   - name:
             ///   - isCompleted:
+            ///   - listId:
             public init(
                 name: Components.Schemas.TodoNameField,
-                isCompleted: Components.Schemas.TodoIsCompletedField
+                isCompleted: Components.Schemas.TodoIsCompletedField,
+                listId: Components.Schemas.ListIdField
             ) {
                 self.name = name
                 self.isCompleted = isCompleted
+                self.listId = listId
             }
             public enum CodingKeys: String, CodingKey {
                 case name
                 case isCompleted
+                case listId
+            }
+        }
+        /// - Remark: Generated from `#/components/schemas/ListSchema`.
+        public struct ListSchema: Codable, Hashable, Sendable {
+            /// - Remark: Generated from `#/components/schemas/ListSchema/id`.
+            public var id: Components.Schemas.ListIdField
+            /// - Remark: Generated from `#/components/schemas/ListSchema/name`.
+            public var name: Components.Schemas.ListNameField
+            /// Creates a new `ListSchema`.
+            ///
+            /// - Parameters:
+            ///   - id:
+            ///   - name:
+            public init(
+                id: Components.Schemas.ListIdField,
+                name: Components.Schemas.ListNameField
+            ) {
+                self.id = id
+                self.name = name
+            }
+            public enum CodingKeys: String, CodingKey {
+                case id
+                case name
+            }
+        }
+        /// - Remark: Generated from `#/components/schemas/ListNameField`.
+        public typealias ListNameField = Swift.String
+        /// - Remark: Generated from `#/components/schemas/ListCreateSchema`.
+        public struct ListCreateSchema: Codable, Hashable, Sendable {
+            /// - Remark: Generated from `#/components/schemas/ListCreateSchema/name`.
+            public var name: Components.Schemas.ListNameField
+            /// Creates a new `ListCreateSchema`.
+            ///
+            /// - Parameters:
+            ///   - name:
+            public init(name: Components.Schemas.ListNameField) {
+                self.name = name
+            }
+            public enum CodingKeys: String, CodingKey {
+                case name
             }
         }
     }
@@ -165,6 +279,10 @@ public enum Components {
         ///
         /// - Remark: Generated from `#/components/parameters/TodoIdParameter`.
         public typealias TodoIdParameter = Components.Schemas.TodoIdField
+        /// List identifier
+        ///
+        /// - Remark: Generated from `#/components/parameters/ListIdParameter`.
+        public typealias ListIdParameter = Components.Schemas.ListIdField
     }
     /// Types generated from the `#/components/requestBodies` section of the OpenAPI document.
     public enum RequestBodies {
@@ -172,6 +290,11 @@ public enum Components {
         @frozen public enum TodoRequestBody: Sendable, Hashable {
             /// - Remark: Generated from `#/components/requestBodies/TodoRequestBody/content/application\/json`.
             case json(Components.Schemas.TodoCreateSchema)
+        }
+        /// - Remark: Generated from `#/components/requestBodies/ListRequestBody`.
+        @frozen public enum ListRequestBody: Sendable, Hashable {
+            /// - Remark: Generated from `#/components/requestBodies/ListRequestBody/content/application\/json`.
+            case json(Components.Schemas.ListCreateSchema)
         }
     }
     /// Types generated from the `#/components/responses` section of the OpenAPI document.
@@ -243,6 +366,62 @@ public enum Components {
         public struct NotFoundResponse: Sendable, Hashable {
             /// Creates a new `NotFoundResponse`.
             public init() {}
+        }
+        public struct ListListResponse: Sendable, Hashable {
+            /// - Remark: Generated from `#/components/responses/ListListResponse/content`.
+            @frozen public enum Body: Sendable, Hashable {
+                /// - Remark: Generated from `#/components/responses/ListListResponse/content/application\/json`.
+                case json([Components.Schemas.ListSchema])
+                /// The associated value of the enum case if `self` is `.json`.
+                ///
+                /// - Throws: An error if `self` is not `.json`.
+                /// - SeeAlso: `.json`.
+                public var json: [Components.Schemas.ListSchema] {
+                    get throws {
+                        switch self {
+                        case let .json(body):
+                            return body
+                        }
+                    }
+                }
+            }
+            /// Received HTTP response body
+            public var body: Components.Responses.ListListResponse.Body
+            /// Creates a new `ListListResponse`.
+            ///
+            /// - Parameters:
+            ///   - body: Received HTTP response body
+            public init(body: Components.Responses.ListListResponse.Body) {
+                self.body = body
+            }
+        }
+        public struct ListResponse: Sendable, Hashable {
+            /// - Remark: Generated from `#/components/responses/ListResponse/content`.
+            @frozen public enum Body: Sendable, Hashable {
+                /// - Remark: Generated from `#/components/responses/ListResponse/content/application\/json`.
+                case json(Components.Schemas.ListSchema)
+                /// The associated value of the enum case if `self` is `.json`.
+                ///
+                /// - Throws: An error if `self` is not `.json`.
+                /// - SeeAlso: `.json`.
+                public var json: Components.Schemas.ListSchema {
+                    get throws {
+                        switch self {
+                        case let .json(body):
+                            return body
+                        }
+                    }
+                }
+            }
+            /// Received HTTP response body
+            public var body: Components.Responses.ListResponse.Body
+            /// Creates a new `ListResponse`.
+            ///
+            /// - Parameters:
+            ///   - body: Received HTTP response body
+            public init(body: Components.Responses.ListResponse.Body) {
+                self.body = body
+            }
         }
     }
     /// Types generated from the `#/components/headers` section of the OpenAPI document.
@@ -1035,6 +1214,818 @@ public enum Operations {
             /// Todo not found
             ///
             /// - Remark: Generated from `#/paths//todos/{todoId}/delete(deleteTodo)/responses/404`.
+            ///
+            /// HTTP response code: `404 notFound`.
+            public static var notFound: Self {
+                .notFound(.init())
+            }
+            /// The associated value of the enum case if `self` is `.notFound`.
+            ///
+            /// - Throws: An error if `self` is not `.notFound`.
+            /// - SeeAlso: `.notFound`.
+            public var notFound: Components.Responses.NotFoundResponse {
+                get throws {
+                    switch self {
+                    case let .notFound(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "notFound",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Undocumented response.
+            ///
+            /// A response with a code that is not documented in the OpenAPI document.
+            case undocumented(statusCode: Swift.Int, OpenAPIRuntime.UndocumentedPayload)
+        }
+    }
+    /// - Remark: HTTP `GET /lists`.
+    /// - Remark: Generated from `#/paths//lists/get(listLists)`.
+    public enum ListLists {
+        public static let id: Swift.String = "listLists"
+        public struct Input: Sendable, Hashable {
+            /// - Remark: Generated from `#/paths/lists/GET/header`.
+            public struct Headers: Sendable, Hashable {
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.ListLists.AcceptableContentType>]
+                /// Creates a new `Headers`.
+                ///
+                /// - Parameters:
+                ///   - accept:
+                public init(accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.ListLists.AcceptableContentType>] = .defaultValues()) {
+                    self.accept = accept
+                }
+            }
+            public var headers: Operations.ListLists.Input.Headers
+            /// Creates a new `Input`.
+            ///
+            /// - Parameters:
+            ///   - headers:
+            public init(headers: Operations.ListLists.Input.Headers = .init()) {
+                self.headers = headers
+            }
+        }
+        @frozen public enum Output: Sendable, Hashable {
+            /// List list response
+            ///
+            /// - Remark: Generated from `#/paths//lists/get(listLists)/responses/200`.
+            ///
+            /// HTTP response code: `200 ok`.
+            case ok(Components.Responses.ListListResponse)
+            /// The associated value of the enum case if `self` is `.ok`.
+            ///
+            /// - Throws: An error if `self` is not `.ok`.
+            /// - SeeAlso: `.ok`.
+            public var ok: Components.Responses.ListListResponse {
+                get throws {
+                    switch self {
+                    case let .ok(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "ok",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Bad input
+            ///
+            /// - Remark: Generated from `#/paths//lists/get(listLists)/responses/400`.
+            ///
+            /// HTTP response code: `400 badRequest`.
+            case badRequest(Components.Responses.BadInputResponse)
+            /// Bad input
+            ///
+            /// - Remark: Generated from `#/paths//lists/get(listLists)/responses/400`.
+            ///
+            /// HTTP response code: `400 badRequest`.
+            public static var badRequest: Self {
+                .badRequest(.init())
+            }
+            /// The associated value of the enum case if `self` is `.badRequest`.
+            ///
+            /// - Throws: An error if `self` is not `.badRequest`.
+            /// - SeeAlso: `.badRequest`.
+            public var badRequest: Components.Responses.BadInputResponse {
+                get throws {
+                    switch self {
+                    case let .badRequest(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "badRequest",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Unprocessable entity
+            ///
+            /// - Remark: Generated from `#/paths//lists/get(listLists)/responses/422`.
+            ///
+            /// HTTP response code: `422 unprocessableContent`.
+            case unprocessableContent(Components.Responses.UnprocessableEntityResponse)
+            /// Unprocessable entity
+            ///
+            /// - Remark: Generated from `#/paths//lists/get(listLists)/responses/422`.
+            ///
+            /// HTTP response code: `422 unprocessableContent`.
+            public static var unprocessableContent: Self {
+                .unprocessableContent(.init())
+            }
+            /// The associated value of the enum case if `self` is `.unprocessableContent`.
+            ///
+            /// - Throws: An error if `self` is not `.unprocessableContent`.
+            /// - SeeAlso: `.unprocessableContent`.
+            public var unprocessableContent: Components.Responses.UnprocessableEntityResponse {
+                get throws {
+                    switch self {
+                    case let .unprocessableContent(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "unprocessableContent",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Undocumented response.
+            ///
+            /// A response with a code that is not documented in the OpenAPI document.
+            case undocumented(statusCode: Swift.Int, OpenAPIRuntime.UndocumentedPayload)
+        }
+        @frozen public enum AcceptableContentType: AcceptableProtocol {
+            case json
+            case other(Swift.String)
+            public init?(rawValue: Swift.String) {
+                switch rawValue.lowercased() {
+                case "application/json":
+                    self = .json
+                default:
+                    self = .other(rawValue)
+                }
+            }
+            public var rawValue: Swift.String {
+                switch self {
+                case let .other(string):
+                    return string
+                case .json:
+                    return "application/json"
+                }
+            }
+            public static var allCases: [Self] {
+                [
+                    .json
+                ]
+            }
+        }
+    }
+    /// - Remark: HTTP `POST /lists`.
+    /// - Remark: Generated from `#/paths//lists/post(createList)`.
+    public enum CreateList {
+        public static let id: Swift.String = "createList"
+        public struct Input: Sendable, Hashable {
+            /// - Remark: Generated from `#/paths/lists/POST/header`.
+            public struct Headers: Sendable, Hashable {
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.CreateList.AcceptableContentType>]
+                /// Creates a new `Headers`.
+                ///
+                /// - Parameters:
+                ///   - accept:
+                public init(accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.CreateList.AcceptableContentType>] = .defaultValues()) {
+                    self.accept = accept
+                }
+            }
+            public var headers: Operations.CreateList.Input.Headers
+            public var body: Components.RequestBodies.ListRequestBody
+            /// Creates a new `Input`.
+            ///
+            /// - Parameters:
+            ///   - headers:
+            ///   - body:
+            public init(
+                headers: Operations.CreateList.Input.Headers = .init(),
+                body: Components.RequestBodies.ListRequestBody
+            ) {
+                self.headers = headers
+                self.body = body
+            }
+        }
+        @frozen public enum Output: Sendable, Hashable {
+            /// List response
+            ///
+            /// - Remark: Generated from `#/paths//lists/post(createList)/responses/201`.
+            ///
+            /// HTTP response code: `201 created`.
+            case created(Components.Responses.ListResponse)
+            /// The associated value of the enum case if `self` is `.created`.
+            ///
+            /// - Throws: An error if `self` is not `.created`.
+            /// - SeeAlso: `.created`.
+            public var created: Components.Responses.ListResponse {
+                get throws {
+                    switch self {
+                    case let .created(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "created",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Bad input
+            ///
+            /// - Remark: Generated from `#/paths//lists/post(createList)/responses/400`.
+            ///
+            /// HTTP response code: `400 badRequest`.
+            case badRequest(Components.Responses.BadInputResponse)
+            /// Bad input
+            ///
+            /// - Remark: Generated from `#/paths//lists/post(createList)/responses/400`.
+            ///
+            /// HTTP response code: `400 badRequest`.
+            public static var badRequest: Self {
+                .badRequest(.init())
+            }
+            /// The associated value of the enum case if `self` is `.badRequest`.
+            ///
+            /// - Throws: An error if `self` is not `.badRequest`.
+            /// - SeeAlso: `.badRequest`.
+            public var badRequest: Components.Responses.BadInputResponse {
+                get throws {
+                    switch self {
+                    case let .badRequest(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "badRequest",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Unprocessable entity
+            ///
+            /// - Remark: Generated from `#/paths//lists/post(createList)/responses/422`.
+            ///
+            /// HTTP response code: `422 unprocessableContent`.
+            case unprocessableContent(Components.Responses.UnprocessableEntityResponse)
+            /// Unprocessable entity
+            ///
+            /// - Remark: Generated from `#/paths//lists/post(createList)/responses/422`.
+            ///
+            /// HTTP response code: `422 unprocessableContent`.
+            public static var unprocessableContent: Self {
+                .unprocessableContent(.init())
+            }
+            /// The associated value of the enum case if `self` is `.unprocessableContent`.
+            ///
+            /// - Throws: An error if `self` is not `.unprocessableContent`.
+            /// - SeeAlso: `.unprocessableContent`.
+            public var unprocessableContent: Components.Responses.UnprocessableEntityResponse {
+                get throws {
+                    switch self {
+                    case let .unprocessableContent(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "unprocessableContent",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Todo not found
+            ///
+            /// - Remark: Generated from `#/paths//lists/post(createList)/responses/404`.
+            ///
+            /// HTTP response code: `404 notFound`.
+            case notFound(Components.Responses.NotFoundResponse)
+            /// Todo not found
+            ///
+            /// - Remark: Generated from `#/paths//lists/post(createList)/responses/404`.
+            ///
+            /// HTTP response code: `404 notFound`.
+            public static var notFound: Self {
+                .notFound(.init())
+            }
+            /// The associated value of the enum case if `self` is `.notFound`.
+            ///
+            /// - Throws: An error if `self` is not `.notFound`.
+            /// - SeeAlso: `.notFound`.
+            public var notFound: Components.Responses.NotFoundResponse {
+                get throws {
+                    switch self {
+                    case let .notFound(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "notFound",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Undocumented response.
+            ///
+            /// A response with a code that is not documented in the OpenAPI document.
+            case undocumented(statusCode: Swift.Int, OpenAPIRuntime.UndocumentedPayload)
+        }
+        @frozen public enum AcceptableContentType: AcceptableProtocol {
+            case json
+            case other(Swift.String)
+            public init?(rawValue: Swift.String) {
+                switch rawValue.lowercased() {
+                case "application/json":
+                    self = .json
+                default:
+                    self = .other(rawValue)
+                }
+            }
+            public var rawValue: Swift.String {
+                switch self {
+                case let .other(string):
+                    return string
+                case .json:
+                    return "application/json"
+                }
+            }
+            public static var allCases: [Self] {
+                [
+                    .json
+                ]
+            }
+        }
+    }
+    /// - Remark: HTTP `GET /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/get(getList)`.
+    public enum GetList {
+        public static let id: Swift.String = "getList"
+        public struct Input: Sendable, Hashable {
+            /// - Remark: Generated from `#/paths/lists/{listId}/GET/path`.
+            public struct Path: Sendable, Hashable {
+                /// List identifier
+                ///
+                /// - Remark: Generated from `#/paths/lists/{listId}/GET/path/listId`.
+                public var listId: Components.Parameters.ListIdParameter
+                /// Creates a new `Path`.
+                ///
+                /// - Parameters:
+                ///   - listId: List identifier
+                public init(listId: Components.Parameters.ListIdParameter) {
+                    self.listId = listId
+                }
+            }
+            public var path: Operations.GetList.Input.Path
+            /// - Remark: Generated from `#/paths/lists/{listId}/GET/header`.
+            public struct Headers: Sendable, Hashable {
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetList.AcceptableContentType>]
+                /// Creates a new `Headers`.
+                ///
+                /// - Parameters:
+                ///   - accept:
+                public init(accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.GetList.AcceptableContentType>] = .defaultValues()) {
+                    self.accept = accept
+                }
+            }
+            public var headers: Operations.GetList.Input.Headers
+            /// Creates a new `Input`.
+            ///
+            /// - Parameters:
+            ///   - path:
+            ///   - headers:
+            public init(
+                path: Operations.GetList.Input.Path,
+                headers: Operations.GetList.Input.Headers = .init()
+            ) {
+                self.path = path
+                self.headers = headers
+            }
+        }
+        @frozen public enum Output: Sendable, Hashable {
+            /// List response
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/get(getList)/responses/200`.
+            ///
+            /// HTTP response code: `200 ok`.
+            case ok(Components.Responses.ListResponse)
+            /// The associated value of the enum case if `self` is `.ok`.
+            ///
+            /// - Throws: An error if `self` is not `.ok`.
+            /// - SeeAlso: `.ok`.
+            public var ok: Components.Responses.ListResponse {
+                get throws {
+                    switch self {
+                    case let .ok(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "ok",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Bad input
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/get(getList)/responses/400`.
+            ///
+            /// HTTP response code: `400 badRequest`.
+            case badRequest(Components.Responses.BadInputResponse)
+            /// Bad input
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/get(getList)/responses/400`.
+            ///
+            /// HTTP response code: `400 badRequest`.
+            public static var badRequest: Self {
+                .badRequest(.init())
+            }
+            /// The associated value of the enum case if `self` is `.badRequest`.
+            ///
+            /// - Throws: An error if `self` is not `.badRequest`.
+            /// - SeeAlso: `.badRequest`.
+            public var badRequest: Components.Responses.BadInputResponse {
+                get throws {
+                    switch self {
+                    case let .badRequest(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "badRequest",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Todo not found
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/get(getList)/responses/404`.
+            ///
+            /// HTTP response code: `404 notFound`.
+            case notFound(Components.Responses.NotFoundResponse)
+            /// Todo not found
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/get(getList)/responses/404`.
+            ///
+            /// HTTP response code: `404 notFound`.
+            public static var notFound: Self {
+                .notFound(.init())
+            }
+            /// The associated value of the enum case if `self` is `.notFound`.
+            ///
+            /// - Throws: An error if `self` is not `.notFound`.
+            /// - SeeAlso: `.notFound`.
+            public var notFound: Components.Responses.NotFoundResponse {
+                get throws {
+                    switch self {
+                    case let .notFound(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "notFound",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Unprocessable entity
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/get(getList)/responses/422`.
+            ///
+            /// HTTP response code: `422 unprocessableContent`.
+            case unprocessableContent(Components.Responses.UnprocessableEntityResponse)
+            /// Unprocessable entity
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/get(getList)/responses/422`.
+            ///
+            /// HTTP response code: `422 unprocessableContent`.
+            public static var unprocessableContent: Self {
+                .unprocessableContent(.init())
+            }
+            /// The associated value of the enum case if `self` is `.unprocessableContent`.
+            ///
+            /// - Throws: An error if `self` is not `.unprocessableContent`.
+            /// - SeeAlso: `.unprocessableContent`.
+            public var unprocessableContent: Components.Responses.UnprocessableEntityResponse {
+                get throws {
+                    switch self {
+                    case let .unprocessableContent(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "unprocessableContent",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Undocumented response.
+            ///
+            /// A response with a code that is not documented in the OpenAPI document.
+            case undocumented(statusCode: Swift.Int, OpenAPIRuntime.UndocumentedPayload)
+        }
+        @frozen public enum AcceptableContentType: AcceptableProtocol {
+            case json
+            case other(Swift.String)
+            public init?(rawValue: Swift.String) {
+                switch rawValue.lowercased() {
+                case "application/json":
+                    self = .json
+                default:
+                    self = .other(rawValue)
+                }
+            }
+            public var rawValue: Swift.String {
+                switch self {
+                case let .other(string):
+                    return string
+                case .json:
+                    return "application/json"
+                }
+            }
+            public static var allCases: [Self] {
+                [
+                    .json
+                ]
+            }
+        }
+    }
+    /// - Remark: HTTP `PUT /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/put(updateList)`.
+    public enum UpdateList {
+        public static let id: Swift.String = "updateList"
+        public struct Input: Sendable, Hashable {
+            /// - Remark: Generated from `#/paths/lists/{listId}/PUT/path`.
+            public struct Path: Sendable, Hashable {
+                /// List identifier
+                ///
+                /// - Remark: Generated from `#/paths/lists/{listId}/PUT/path/listId`.
+                public var listId: Components.Parameters.ListIdParameter
+                /// Creates a new `Path`.
+                ///
+                /// - Parameters:
+                ///   - listId: List identifier
+                public init(listId: Components.Parameters.ListIdParameter) {
+                    self.listId = listId
+                }
+            }
+            public var path: Operations.UpdateList.Input.Path
+            /// - Remark: Generated from `#/paths/lists/{listId}/PUT/header`.
+            public struct Headers: Sendable, Hashable {
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.UpdateList.AcceptableContentType>]
+                /// Creates a new `Headers`.
+                ///
+                /// - Parameters:
+                ///   - accept:
+                public init(accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.UpdateList.AcceptableContentType>] = .defaultValues()) {
+                    self.accept = accept
+                }
+            }
+            public var headers: Operations.UpdateList.Input.Headers
+            public var body: Components.RequestBodies.ListRequestBody
+            /// Creates a new `Input`.
+            ///
+            /// - Parameters:
+            ///   - path:
+            ///   - headers:
+            ///   - body:
+            public init(
+                path: Operations.UpdateList.Input.Path,
+                headers: Operations.UpdateList.Input.Headers = .init(),
+                body: Components.RequestBodies.ListRequestBody
+            ) {
+                self.path = path
+                self.headers = headers
+                self.body = body
+            }
+        }
+        @frozen public enum Output: Sendable, Hashable {
+            /// List response
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/put(updateList)/responses/200`.
+            ///
+            /// HTTP response code: `200 ok`.
+            case ok(Components.Responses.ListResponse)
+            /// The associated value of the enum case if `self` is `.ok`.
+            ///
+            /// - Throws: An error if `self` is not `.ok`.
+            /// - SeeAlso: `.ok`.
+            public var ok: Components.Responses.ListResponse {
+                get throws {
+                    switch self {
+                    case let .ok(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "ok",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Bad input
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/put(updateList)/responses/400`.
+            ///
+            /// HTTP response code: `400 badRequest`.
+            case badRequest(Components.Responses.BadInputResponse)
+            /// Bad input
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/put(updateList)/responses/400`.
+            ///
+            /// HTTP response code: `400 badRequest`.
+            public static var badRequest: Self {
+                .badRequest(.init())
+            }
+            /// The associated value of the enum case if `self` is `.badRequest`.
+            ///
+            /// - Throws: An error if `self` is not `.badRequest`.
+            /// - SeeAlso: `.badRequest`.
+            public var badRequest: Components.Responses.BadInputResponse {
+                get throws {
+                    switch self {
+                    case let .badRequest(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "badRequest",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Todo not found
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/put(updateList)/responses/404`.
+            ///
+            /// HTTP response code: `404 notFound`.
+            case notFound(Components.Responses.NotFoundResponse)
+            /// Todo not found
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/put(updateList)/responses/404`.
+            ///
+            /// HTTP response code: `404 notFound`.
+            public static var notFound: Self {
+                .notFound(.init())
+            }
+            /// The associated value of the enum case if `self` is `.notFound`.
+            ///
+            /// - Throws: An error if `self` is not `.notFound`.
+            /// - SeeAlso: `.notFound`.
+            public var notFound: Components.Responses.NotFoundResponse {
+                get throws {
+                    switch self {
+                    case let .notFound(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "notFound",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Unprocessable entity
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/put(updateList)/responses/422`.
+            ///
+            /// HTTP response code: `422 unprocessableContent`.
+            case unprocessableContent(Components.Responses.UnprocessableEntityResponse)
+            /// Unprocessable entity
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/put(updateList)/responses/422`.
+            ///
+            /// HTTP response code: `422 unprocessableContent`.
+            public static var unprocessableContent: Self {
+                .unprocessableContent(.init())
+            }
+            /// The associated value of the enum case if `self` is `.unprocessableContent`.
+            ///
+            /// - Throws: An error if `self` is not `.unprocessableContent`.
+            /// - SeeAlso: `.unprocessableContent`.
+            public var unprocessableContent: Components.Responses.UnprocessableEntityResponse {
+                get throws {
+                    switch self {
+                    case let .unprocessableContent(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "unprocessableContent",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Undocumented response.
+            ///
+            /// A response with a code that is not documented in the OpenAPI document.
+            case undocumented(statusCode: Swift.Int, OpenAPIRuntime.UndocumentedPayload)
+        }
+        @frozen public enum AcceptableContentType: AcceptableProtocol {
+            case json
+            case other(Swift.String)
+            public init?(rawValue: Swift.String) {
+                switch rawValue.lowercased() {
+                case "application/json":
+                    self = .json
+                default:
+                    self = .other(rawValue)
+                }
+            }
+            public var rawValue: Swift.String {
+                switch self {
+                case let .other(string):
+                    return string
+                case .json:
+                    return "application/json"
+                }
+            }
+            public static var allCases: [Self] {
+                [
+                    .json
+                ]
+            }
+        }
+    }
+    /// - Remark: HTTP `DELETE /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/delete(deleteList)`.
+    public enum DeleteList {
+        public static let id: Swift.String = "deleteList"
+        public struct Input: Sendable, Hashable {
+            /// - Remark: Generated from `#/paths/lists/{listId}/DELETE/path`.
+            public struct Path: Sendable, Hashable {
+                /// List identifier
+                ///
+                /// - Remark: Generated from `#/paths/lists/{listId}/DELETE/path/listId`.
+                public var listId: Components.Parameters.ListIdParameter
+                /// Creates a new `Path`.
+                ///
+                /// - Parameters:
+                ///   - listId: List identifier
+                public init(listId: Components.Parameters.ListIdParameter) {
+                    self.listId = listId
+                }
+            }
+            public var path: Operations.DeleteList.Input.Path
+            /// Creates a new `Input`.
+            ///
+            /// - Parameters:
+            ///   - path:
+            public init(path: Operations.DeleteList.Input.Path) {
+                self.path = path
+            }
+        }
+        @frozen public enum Output: Sendable, Hashable {
+            public struct NoContent: Sendable, Hashable {
+                /// Creates a new `NoContent`.
+                public init() {}
+            }
+            /// List deleted
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/delete(deleteList)/responses/204`.
+            ///
+            /// HTTP response code: `204 noContent`.
+            case noContent(Operations.DeleteList.Output.NoContent)
+            /// List deleted
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/delete(deleteList)/responses/204`.
+            ///
+            /// HTTP response code: `204 noContent`.
+            public static var noContent: Self {
+                .noContent(.init())
+            }
+            /// The associated value of the enum case if `self` is `.noContent`.
+            ///
+            /// - Throws: An error if `self` is not `.noContent`.
+            /// - SeeAlso: `.noContent`.
+            public var noContent: Operations.DeleteList.Output.NoContent {
+                get throws {
+                    switch self {
+                    case let .noContent(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "noContent",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Todo not found
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/delete(deleteList)/responses/404`.
+            ///
+            /// HTTP response code: `404 notFound`.
+            case notFound(Components.Responses.NotFoundResponse)
+            /// Todo not found
+            ///
+            /// - Remark: Generated from `#/paths//lists/{listId}/delete(deleteList)/responses/404`.
             ///
             /// HTTP response code: `404 notFound`.
             public static var notFound: Self {

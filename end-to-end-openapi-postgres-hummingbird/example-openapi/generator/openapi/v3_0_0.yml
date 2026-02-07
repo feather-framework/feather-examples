@@ -1,0 +1,294 @@
+openapi: 3.0.0
+info:
+  title: Todo API - example
+  version: 1.0.0
+tags:
+- name: Todos
+  description: Manage todos.
+- name: Lists
+  description: Manage lists.
+servers:
+- url: http://127.0.0.1:8080/
+paths:
+  /todos:
+    get:
+      tags:
+      - Todos
+      operationId: listTodos
+      responses:
+        200:
+          $ref: '#/components/responses/TodoListResponse'
+        400:
+          $ref: '#/components/responses/BadInputResponse'
+        422:
+          $ref: '#/components/responses/UnprocessableEntityResponse'
+    post:
+      tags:
+      - Todos
+      operationId: createTodo
+      requestBody:
+        $ref: '#/components/requestBodies/TodoRequestBody'
+      responses:
+        201:
+          $ref: '#/components/responses/TodoResponse'
+        400:
+          $ref: '#/components/responses/BadInputResponse'
+        422:
+          $ref: '#/components/responses/UnprocessableEntityResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+  /todos/{todoId}:
+    get:
+      tags:
+      - Todos
+      operationId: getTodo
+      parameters:
+      - $ref: '#/components/parameters/TodoIdParameter'
+      responses:
+        200:
+          $ref: '#/components/responses/TodoResponse'
+        400:
+          $ref: '#/components/responses/BadInputResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+        422:
+          $ref: '#/components/responses/UnprocessableEntityResponse'
+    put:
+      tags:
+      - Todos
+      operationId: updateTodo
+      parameters:
+      - $ref: '#/components/parameters/TodoIdParameter'
+      requestBody:
+        $ref: '#/components/requestBodies/TodoRequestBody'
+      responses:
+        200:
+          $ref: '#/components/responses/TodoResponse'
+        400:
+          $ref: '#/components/responses/BadInputResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+        422:
+          $ref: '#/components/responses/UnprocessableEntityResponse'
+    delete:
+      tags:
+      - Todos
+      operationId: deleteTodo
+      parameters:
+      - $ref: '#/components/parameters/TodoIdParameter'
+      responses:
+        204:
+          description: Todo deleted
+          headers: {}
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+  /lists:
+    get:
+      tags:
+      - Lists
+      operationId: listLists
+      responses:
+        200:
+          $ref: '#/components/responses/ListListResponse'
+        400:
+          $ref: '#/components/responses/BadInputResponse'
+        422:
+          $ref: '#/components/responses/UnprocessableEntityResponse'
+    post:
+      tags:
+      - Lists
+      operationId: createList
+      requestBody:
+        $ref: '#/components/requestBodies/ListRequestBody'
+      responses:
+        201:
+          $ref: '#/components/responses/ListResponse'
+        400:
+          $ref: '#/components/responses/BadInputResponse'
+        422:
+          $ref: '#/components/responses/UnprocessableEntityResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+  /lists/{listId}:
+    get:
+      tags:
+      - Lists
+      operationId: getList
+      parameters:
+      - $ref: '#/components/parameters/ListIdParameter'
+      responses:
+        200:
+          $ref: '#/components/responses/ListResponse'
+        400:
+          $ref: '#/components/responses/BadInputResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+        422:
+          $ref: '#/components/responses/UnprocessableEntityResponse'
+    put:
+      tags:
+      - Lists
+      operationId: updateList
+      parameters:
+      - $ref: '#/components/parameters/ListIdParameter'
+      requestBody:
+        $ref: '#/components/requestBodies/ListRequestBody'
+      responses:
+        200:
+          $ref: '#/components/responses/ListResponse'
+        400:
+          $ref: '#/components/responses/BadInputResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+        422:
+          $ref: '#/components/responses/UnprocessableEntityResponse'
+    delete:
+      tags:
+      - Lists
+      operationId: deleteList
+      parameters:
+      - $ref: '#/components/parameters/ListIdParameter'
+      responses:
+        204:
+          description: List deleted
+          headers: {}
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+components:
+  schemas:
+    TodoSchema:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/TodoIdField'
+        name:
+          $ref: '#/components/schemas/TodoNameField'
+        isCompleted:
+          $ref: '#/components/schemas/TodoIsCompletedField'
+        listId:
+          $ref: '#/components/schemas/ListIdField'
+      required:
+      - id
+      - name
+      - isCompleted
+      - listId
+    TodoIdField:
+      type: string
+      default: null
+      example: 8tQ2mP1xV6nC
+    TodoNameField:
+      type: string
+      default: null
+      example: Buy groceries
+    TodoIsCompletedField:
+      type: boolean
+      default: null
+      example: false
+    ListIdField:
+      type: string
+      default: null
+      example: 4kM7nR2zQ9pL
+    TodoCreateSchema:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/TodoNameField'
+        isCompleted:
+          $ref: '#/components/schemas/TodoIsCompletedField'
+        listId:
+          $ref: '#/components/schemas/ListIdField'
+      required:
+      - name
+      - isCompleted
+      - listId
+    ListSchema:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ListIdField'
+        name:
+          $ref: '#/components/schemas/ListNameField'
+      required:
+      - id
+      - name
+    ListNameField:
+      type: string
+      default: null
+      example: Work
+    ListCreateSchema:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/ListNameField'
+      required:
+      - name
+  responses:
+    TodoListResponse:
+      description: Todo list response
+      headers: {}
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/TodoSchema'
+    BadInputResponse:
+      description: Bad input
+      headers: {}
+    UnprocessableEntityResponse:
+      description: Unprocessable entity
+      headers: {}
+    TodoResponse:
+      description: Todo response
+      headers: {}
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TodoSchema'
+    NotFoundResponse:
+      description: Todo not found
+      headers: {}
+    ListListResponse:
+      description: List list response
+      headers: {}
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ListSchema'
+    ListResponse:
+      description: List response
+      headers: {}
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListSchema'
+  parameters:
+    TodoIdParameter:
+      name: todoId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/TodoIdField'
+      description: Todo identifier
+    ListIdParameter:
+      name: listId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/ListIdField'
+      description: List identifier
+  requestBodies:
+    TodoRequestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TodoCreateSchema'
+      required: true
+    ListRequestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListCreateSchema'
+      required: true

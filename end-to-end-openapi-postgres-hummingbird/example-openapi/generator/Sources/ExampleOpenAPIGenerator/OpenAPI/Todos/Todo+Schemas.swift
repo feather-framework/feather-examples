@@ -25,6 +25,14 @@ struct TodoCreateSchema: ObjectSchemaRepresentable {
         [
             "name": TodoNameField().reference(),
             "isCompleted": TodoIsCompletedField().reference(),
+            "listId": ListIdField().reference(),
+        ]
+    }
+
+    var requiredProperties: [String] {
+        [
+            "name",
+            "isCompleted",
         ]
     }
 }
@@ -35,6 +43,15 @@ struct TodoSchema: ObjectSchemaRepresentable {
             "id": TodoIdField().reference(),
             "name": TodoNameField().reference(),
             "isCompleted": TodoIsCompletedField().reference(),
+            "listId": ListIdField().reference(),
+        ]
+    }
+
+    var requiredProperties: [String] {
+        [
+            "id",
+            "name",
+            "isCompleted",
         ]
     }
 }

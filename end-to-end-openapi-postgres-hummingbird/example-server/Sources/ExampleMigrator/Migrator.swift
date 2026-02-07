@@ -1,9 +1,8 @@
 import FeatherDatabase
-import FeatherPostgresDatabase
 
 struct Migrator: Sendable {
     
-    var database: PostgresDatabaseClient
+    var database: any DatabaseClient
 
     func run() async throws {
         try await database.withConnection { connection in
@@ -15,7 +14,7 @@ struct Migrator: Sendable {
                         is_completed BOOLEAN
                     );
                     """#
-            )
+            ) { _ in }
             
 //            try await connection.run(
 //                query: #"""

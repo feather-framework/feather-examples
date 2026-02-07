@@ -7,7 +7,7 @@ SWIFT_OPENAPI_GENERATOR_GIT_URL ?= https://github.com/apple/swift-openapi-genera
 SWIFT_OPENAPI_GENERATOR_GIT_TAG ?= 1.10.4
 SWIFT_OPENAPI_GENERATOR_CLONE_DIR ?= $(CURRENT_MAKEFILE_DIR)/.swift-openapi-generator
 SWIFT_OPENAPI_GENERATOR_BUILD_CONFIGURATION ?= debug
-OPENAPI_YAML_PATH ?= $(CURRENT_MAKEFILE_DIR)/openapi.yaml
+OPENAPI_YAML_PATH ?= $(CURRENT_MAKEFILE_DIR)/openapi/openapi.yaml
 OPENAPI_GENERATOR_CONFIG_PATH ?= $(CURRENT_MAKEFILE_DIR)/openapi-generator-config.yaml
 OUTPUT_DIRECTORY ?= $(CURRENT_MAKEFILE_DIR)/Sources/ExampleOpenAPI/
 
@@ -22,6 +22,7 @@ SWIFT_OPENAPI_GENERATOR_BIN := $(SWIFT_OPENAPI_GENERATOR_CLONE_DIR)/.build/$(SWI
 help:  # Display this help.
 	@-+echo "Run make with one of the following targets:"
 	@-+echo
+	@-+echo "  run:           Run the generators to create YAML files and Swift sources."
 	@-+grep -Eh "^[a-z-]+:.*#" $(CURRENT_MAKEFILE_PATH) | sed -E 's/^(.*:)(.*#+)(.*)/  \1 @@@ \3 /' | column -t -s "@@@"
 	@-+echo
 	@-+echo "The following options can be overriden on the command line:"
@@ -33,6 +34,8 @@ help:  # Display this help.
 	@-+echo "  OPENAPI_YAML_PATH (e.g. openapi.yaml)"
 	@-+echo "  OPENAPI_GENERATOR_CONFIG_PATH (e.g. openapi-generator-config.yaml)"
 	@-+echo "  OUTPUT_DIRECTORY (e.g. Sources/ManualGeneratorInvocationClient/Generated)"
+
+run: yaml generate docker
 
 generate: $(SWIFT_OPENAPI_GENERATOR_BIN) $(OPENAPI_YAML_PATH) $(OPENAPI_GENERATOR_CONFIG_PATH) $(OUTPUT_DIRECTORY)  # Generate the sources using swift-openapi-generator.
 	$< generate \
@@ -83,4 +86,11 @@ $(SWIFT_OPENAPI_GENERATOR_BIN): $(SWIFT_OPENAPI_GENERATOR_CLONE_DIR)
 $(OUTPUT_DIRECTORY):
 	mkdir -p "$@"
 
-.PHONY: help generate build clean clean-all dump
+.PHONY: help generate build clean clean-all dump docker yaml
+
+yaml:
+	@cd generator && swift run
+
+docker:
+	@./docker/api/scripts/bootstrap.sh
+	@cp ./openapi/openapi.yaml ./docker/api/www/

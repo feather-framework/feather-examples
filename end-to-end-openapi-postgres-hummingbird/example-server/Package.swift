@@ -57,7 +57,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/feather-framework/feather-postgres-database",
-            exact: "1.0.0-beta.2"
+            exact: "1.0.0-beta.3"
         ),
         .package(
             url: "https://github.com/BinaryBirds/swift-nanoid",

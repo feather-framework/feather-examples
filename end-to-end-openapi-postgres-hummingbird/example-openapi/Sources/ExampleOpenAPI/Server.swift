@@ -85,6 +85,61 @@ extension APIProtocol {
             method: .delete,
             path: server.apiPathComponentsWithServerPrefix("/todos/{todoId}")
         )
+        try transport.register(
+            {
+                try await server.listLists(
+                    request: $0,
+                    body: $1,
+                    metadata: $2
+                )
+            },
+            method: .get,
+            path: server.apiPathComponentsWithServerPrefix("/lists")
+        )
+        try transport.register(
+            {
+                try await server.createList(
+                    request: $0,
+                    body: $1,
+                    metadata: $2
+                )
+            },
+            method: .post,
+            path: server.apiPathComponentsWithServerPrefix("/lists")
+        )
+        try transport.register(
+            {
+                try await server.getList(
+                    request: $0,
+                    body: $1,
+                    metadata: $2
+                )
+            },
+            method: .get,
+            path: server.apiPathComponentsWithServerPrefix("/lists/{listId}")
+        )
+        try transport.register(
+            {
+                try await server.updateList(
+                    request: $0,
+                    body: $1,
+                    metadata: $2
+                )
+            },
+            method: .put,
+            path: server.apiPathComponentsWithServerPrefix("/lists/{listId}")
+        )
+        try transport.register(
+            {
+                try await server.deleteList(
+                    request: $0,
+                    body: $1,
+                    metadata: $2
+                )
+            },
+            method: .delete,
+            path: server.apiPathComponentsWithServerPrefix("/lists/{listId}")
+        )
     }
 }
 
@@ -406,6 +461,342 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                     as: Components.Parameters.TodoIdParameter.self
                 ))
                 return Operations.DeleteTodo.Input(path: path)
+            },
+            serializer: { output, request in
+                switch output {
+                case let .noContent(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 204)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .notFound(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 404)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .undocumented(statusCode, _):
+                    return (.init(soar_statusCode: statusCode), nil)
+                }
+            }
+        )
+    }
+    /// - Remark: HTTP `GET /lists`.
+    /// - Remark: Generated from `#/paths//lists/get(listLists)`.
+    func listLists(
+        request: HTTPTypes.HTTPRequest,
+        body: OpenAPIRuntime.HTTPBody?,
+        metadata: OpenAPIRuntime.ServerRequestMetadata
+    ) async throws -> (HTTPTypes.HTTPResponse, OpenAPIRuntime.HTTPBody?) {
+        try await handle(
+            request: request,
+            requestBody: body,
+            metadata: metadata,
+            forOperation: Operations.ListLists.id,
+            using: {
+                APIHandler.listLists($0)
+            },
+            deserializer: { request, requestBody, metadata in
+                let headers: Operations.ListLists.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
+                return Operations.ListLists.Input(headers: headers)
+            },
+            serializer: { output, request in
+                switch output {
+                case let .ok(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 200)
+                    suppressMutabilityWarning(&response)
+                    let body: OpenAPIRuntime.HTTPBody
+                    switch value.body {
+                    case let .json(value):
+                        try converter.validateAcceptIfPresent(
+                            "application/json",
+                            in: request.headerFields
+                        )
+                        body = try converter.setResponseBodyAsJSON(
+                            value,
+                            headerFields: &response.headerFields,
+                            contentType: "application/json; charset=utf-8"
+                        )
+                    }
+                    return (response, body)
+                case let .badRequest(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 400)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .unprocessableContent(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 422)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .undocumented(statusCode, _):
+                    return (.init(soar_statusCode: statusCode), nil)
+                }
+            }
+        )
+    }
+    /// - Remark: HTTP `POST /lists`.
+    /// - Remark: Generated from `#/paths//lists/post(createList)`.
+    func createList(
+        request: HTTPTypes.HTTPRequest,
+        body: OpenAPIRuntime.HTTPBody?,
+        metadata: OpenAPIRuntime.ServerRequestMetadata
+    ) async throws -> (HTTPTypes.HTTPResponse, OpenAPIRuntime.HTTPBody?) {
+        try await handle(
+            request: request,
+            requestBody: body,
+            metadata: metadata,
+            forOperation: Operations.CreateList.id,
+            using: {
+                APIHandler.createList($0)
+            },
+            deserializer: { request, requestBody, metadata in
+                let headers: Operations.CreateList.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
+                let contentType = converter.extractContentTypeIfPresent(in: request.headerFields)
+                let body: Components.RequestBodies.ListRequestBody
+                let chosenContentType = try converter.bestContentType(
+                    received: contentType,
+                    options: [
+                        "application/json"
+                    ]
+                )
+                switch chosenContentType {
+                case "application/json":
+                    body = try await converter.getRequiredRequestBodyAsJSON(
+                        Components.Schemas.ListCreateSchema.self,
+                        from: requestBody,
+                        transforming: { value in
+                            .json(value)
+                        }
+                    )
+                default:
+                    preconditionFailure("bestContentType chose an invalid content type.")
+                }
+                return Operations.CreateList.Input(
+                    headers: headers,
+                    body: body
+                )
+            },
+            serializer: { output, request in
+                switch output {
+                case let .created(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 201)
+                    suppressMutabilityWarning(&response)
+                    let body: OpenAPIRuntime.HTTPBody
+                    switch value.body {
+                    case let .json(value):
+                        try converter.validateAcceptIfPresent(
+                            "application/json",
+                            in: request.headerFields
+                        )
+                        body = try converter.setResponseBodyAsJSON(
+                            value,
+                            headerFields: &response.headerFields,
+                            contentType: "application/json; charset=utf-8"
+                        )
+                    }
+                    return (response, body)
+                case let .badRequest(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 400)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .unprocessableContent(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 422)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .notFound(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 404)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .undocumented(statusCode, _):
+                    return (.init(soar_statusCode: statusCode), nil)
+                }
+            }
+        )
+    }
+    /// - Remark: HTTP `GET /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/get(getList)`.
+    func getList(
+        request: HTTPTypes.HTTPRequest,
+        body: OpenAPIRuntime.HTTPBody?,
+        metadata: OpenAPIRuntime.ServerRequestMetadata
+    ) async throws -> (HTTPTypes.HTTPResponse, OpenAPIRuntime.HTTPBody?) {
+        try await handle(
+            request: request,
+            requestBody: body,
+            metadata: metadata,
+            forOperation: Operations.GetList.id,
+            using: {
+                APIHandler.getList($0)
+            },
+            deserializer: { request, requestBody, metadata in
+                let path: Operations.GetList.Input.Path = .init(listId: try converter.getPathParameterAsURI(
+                    in: metadata.pathParameters,
+                    name: "listId",
+                    as: Components.Parameters.ListIdParameter.self
+                ))
+                let headers: Operations.GetList.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
+                return Operations.GetList.Input(
+                    path: path,
+                    headers: headers
+                )
+            },
+            serializer: { output, request in
+                switch output {
+                case let .ok(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 200)
+                    suppressMutabilityWarning(&response)
+                    let body: OpenAPIRuntime.HTTPBody
+                    switch value.body {
+                    case let .json(value):
+                        try converter.validateAcceptIfPresent(
+                            "application/json",
+                            in: request.headerFields
+                        )
+                        body = try converter.setResponseBodyAsJSON(
+                            value,
+                            headerFields: &response.headerFields,
+                            contentType: "application/json; charset=utf-8"
+                        )
+                    }
+                    return (response, body)
+                case let .badRequest(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 400)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .notFound(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 404)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .unprocessableContent(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 422)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .undocumented(statusCode, _):
+                    return (.init(soar_statusCode: statusCode), nil)
+                }
+            }
+        )
+    }
+    /// - Remark: HTTP `PUT /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/put(updateList)`.
+    func updateList(
+        request: HTTPTypes.HTTPRequest,
+        body: OpenAPIRuntime.HTTPBody?,
+        metadata: OpenAPIRuntime.ServerRequestMetadata
+    ) async throws -> (HTTPTypes.HTTPResponse, OpenAPIRuntime.HTTPBody?) {
+        try await handle(
+            request: request,
+            requestBody: body,
+            metadata: metadata,
+            forOperation: Operations.UpdateList.id,
+            using: {
+                APIHandler.updateList($0)
+            },
+            deserializer: { request, requestBody, metadata in
+                let path: Operations.UpdateList.Input.Path = .init(listId: try converter.getPathParameterAsURI(
+                    in: metadata.pathParameters,
+                    name: "listId",
+                    as: Components.Parameters.ListIdParameter.self
+                ))
+                let headers: Operations.UpdateList.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
+                let contentType = converter.extractContentTypeIfPresent(in: request.headerFields)
+                let body: Components.RequestBodies.ListRequestBody
+                let chosenContentType = try converter.bestContentType(
+                    received: contentType,
+                    options: [
+                        "application/json"
+                    ]
+                )
+                switch chosenContentType {
+                case "application/json":
+                    body = try await converter.getRequiredRequestBodyAsJSON(
+                        Components.Schemas.ListCreateSchema.self,
+                        from: requestBody,
+                        transforming: { value in
+                            .json(value)
+                        }
+                    )
+                default:
+                    preconditionFailure("bestContentType chose an invalid content type.")
+                }
+                return Operations.UpdateList.Input(
+                    path: path,
+                    headers: headers,
+                    body: body
+                )
+            },
+            serializer: { output, request in
+                switch output {
+                case let .ok(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 200)
+                    suppressMutabilityWarning(&response)
+                    let body: OpenAPIRuntime.HTTPBody
+                    switch value.body {
+                    case let .json(value):
+                        try converter.validateAcceptIfPresent(
+                            "application/json",
+                            in: request.headerFields
+                        )
+                        body = try converter.setResponseBodyAsJSON(
+                            value,
+                            headerFields: &response.headerFields,
+                            contentType: "application/json; charset=utf-8"
+                        )
+                    }
+                    return (response, body)
+                case let .badRequest(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 400)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .notFound(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 404)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .unprocessableContent(value):
+                    suppressUnusedWarning(value)
+                    var response = HTTPTypes.HTTPResponse(soar_statusCode: 422)
+                    suppressMutabilityWarning(&response)
+                    return (response, nil)
+                case let .undocumented(statusCode, _):
+                    return (.init(soar_statusCode: statusCode), nil)
+                }
+            }
+        )
+    }
+    /// - Remark: HTTP `DELETE /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/delete(deleteList)`.
+    func deleteList(
+        request: HTTPTypes.HTTPRequest,
+        body: OpenAPIRuntime.HTTPBody?,
+        metadata: OpenAPIRuntime.ServerRequestMetadata
+    ) async throws -> (HTTPTypes.HTTPResponse, OpenAPIRuntime.HTTPBody?) {
+        try await handle(
+            request: request,
+            requestBody: body,
+            metadata: metadata,
+            forOperation: Operations.DeleteList.id,
+            using: {
+                APIHandler.deleteList($0)
+            },
+            deserializer: { request, requestBody, metadata in
+                let path: Operations.DeleteList.Input.Path = .init(listId: try converter.getPathParameterAsURI(
+                    in: metadata.pathParameters,
+                    name: "listId",
+                    as: Components.Parameters.ListIdParameter.self
+                ))
+                return Operations.DeleteList.Input(path: path)
             },
             serializer: { output, request in
                 switch output {

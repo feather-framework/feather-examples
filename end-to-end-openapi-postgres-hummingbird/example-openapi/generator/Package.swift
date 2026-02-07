@@ -36,7 +36,7 @@ let package = Package(
         .visionOS(.v2),
     ],
     products: [
-        .executable(name: "ExampleOpenAPIGenrator", targets: ["ExampleOpenAPIGenrator"]),
+        .executable(name: "ExampleOpenAPIGenerator", targets: ["ExampleOpenAPIGenerator"]),
     ],
     dependencies: [
         .package(url: "https://github.com/feather-framework/feather-openapi", exact: "1.0.0-beta.3"),
@@ -46,7 +46,7 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "ExampleOpenAPIGenrator",
+            name: "ExampleOpenAPIGenerator",
             dependencies: [
                 .product(name: "FeatherOpenAPI", package: "feather-openapi"),
                 .product(name: "OpenAPIKitCompat", package: "OpenAPIKit"),

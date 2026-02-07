@@ -5,7 +5,7 @@ SWAGGER_UI_URL="https://cdn.jsdelivr.net/npm/swagger-ui-dist"
 SWAGGER_UI_VERSION="5.31.0"
 SWAGGER_UI_DIR="swagger-ui"
 
-WWW_DIR="../www"
+WWW_DIR="docker/api/www"
 
 pushd ${WWW_DIR}
 
