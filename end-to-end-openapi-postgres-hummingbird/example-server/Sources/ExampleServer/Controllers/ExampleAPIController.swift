@@ -12,7 +12,20 @@ private extension Components.Schemas.TodoSchema {
         try .init(
             id: row.decode(column: "id", as: String.self),
             name: row.decode(column: "name", as: String.self),
-            isCompleted: row.decode(column: "is_completed", as: Bool.self)
+            isCompleted: row.decode(column: "is_completed", as: Bool.self),
+            listId: row.decode(column: "list_id", as: String.self)
+        )
+    }
+}
+
+private extension Components.Schemas.ListSchema {
+
+    static func decode(
+        from row: DatabaseRow
+    ) throws -> Self {
+        try .init(
+            id: row.decode(column: "id", as: String.self),
+            name: row.decode(column: "name", as: String.self)
         )
     }
 }
@@ -20,6 +33,157 @@ private extension Components.Schemas.TodoSchema {
 struct ExampleAPIController: APIProtocol {
     
     var database: any DatabaseClient
+
+    // MARK: - lists
+    
+    func deleteList(
+        _ input: Operations.DeleteList.Input
+    ) async throws -> Operations.DeleteList.Output {
+        let listId = input.path.listId
+
+        return try await database.withConnection { connection in
+            try await connection.run(
+                query: #"""
+                    DELETE FROM lists WHERE id=\#(listId);
+                    """#
+            ) { _ in
+                return .noContent
+            }
+        }
+    }
+    
+    func updateList(
+        _ input: Operations.UpdateList.Input
+    ) async throws -> Operations.UpdateList.Output {
+        let listId = input.path.listId
+        let payload: Components.Schemas.ListCreateSchema
+        switch input.body {
+        case let .json(value):
+            payload = value
+        }
+        
+        guard !payload.name.isEmpty else {
+            return .unprocessableContent(.init())
+        }
+
+        return try await database.withConnection { connection in
+            try await connection.run(
+                query: #"""
+                    UPDATE 
+                        lists 
+                    SET
+                        name=\#(payload.name)
+                    WHERE
+                        id=\#(listId)
+                    RETURNING
+                        *;
+                    """#
+            ) { sequence in
+                guard let row = try await sequence.collect().first else {
+                    return .notFound(.init())
+                }
+                let list = try Components.Schemas.ListSchema.decode(from: row)
+
+                return .ok(
+                    .init(
+                        body: .json(list)
+                    )
+                )
+            }
+        }
+    }
+    
+    func getList(
+        _ input: Operations.GetList.Input
+    ) async throws -> Operations.GetList.Output {
+        let listId = input.path.listId
+
+        return try await database.withConnection { connection in
+            try await connection.run(
+                query: #"""
+                    SELECT * FROM lists WHERE id=\#(listId) LIMIT 1;
+                    """#
+            ) { sequence in
+                guard let row = try await sequence.collect().first else {
+                    return .notFound(.init())
+                }
+                let list = try Components.Schemas.ListSchema.decode(from: row)
+
+                return .ok(
+                    .init(
+                        body: .json(list)
+                    )
+                )
+            }
+        }
+    }
+    
+    func createList(
+        _ input: Operations.CreateList.Input
+    ) async throws -> Operations.CreateList.Output {
+        let payload: Components.Schemas.ListCreateSchema
+        switch input.body {
+        case let .json(value):
+            payload = value
+        }
+
+        let listId = NanoID().rawValue
+
+        guard !payload.name.isEmpty else {
+            return .unprocessableContent(.init())
+        }
+
+        return try await database.withConnection { connection in
+            try await connection.run(
+                query: #"""
+                    INSERT INTO 
+                        lists (id, name)
+                    VALUES 
+                        (\#(listId), \#(payload.name))
+                    RETURNING
+                        *;
+                    """#
+            ) { sequence in
+                guard let row = try await sequence.collect().first else {
+                    return .notFound(.init())
+                }
+                let list = try Components.Schemas.ListSchema.decode(from: row)
+
+                return .created(
+                    .init(
+                        body: .json(list)
+                    )
+                )
+            }
+        }
+    }
+    
+    
+    func listLists(
+        _ input: Operations.ListLists.Input
+    ) async throws -> Operations.ListLists.Output {
+        try await database.withConnection { connection in
+            try await connection.run(
+                query: #"""
+                    SELECT * FROM lists ORDER BY id;
+                    """#
+            ) { sequence in
+                let rows = try await sequence.collect()
+                let lists = try rows.map { row in
+                    try Components.Schemas.ListSchema.decode(from: row)
+                }
+                return .ok(
+                    .init(
+                        body: .json(
+                            lists
+                        )
+                    )
+                )
+            }
+        }
+    }
+    
+    // MARK: - todos
 
     func listTodos(
         _ input: Operations.ListTodos.Input
@@ -64,9 +228,9 @@ struct ExampleAPIController: APIProtocol {
             try await connection.run(
                 query: #"""
                     INSERT INTO 
-                        todos (id, name, is_completed)
+                        todos (id, name, is_completed, list_id)
                     VALUES 
-                        (\#(todoId), \#(payload.name), \#(String(payload.isCompleted))
+                        (\#(todoId), \#(payload.name), \#(String(payload.isCompleted)), \#(payload.listId))
                     RETURNING
                         *;
                     """#
@@ -131,7 +295,8 @@ struct ExampleAPIController: APIProtocol {
                         todos 
                     SET
                         name=\#(payload.name),
-                        is_completed=\#(String(payload.isCompleted))
+                        is_completed=\#(String(payload.isCompleted)),
+                        list_id=\#(payload.listId)
                     WHERE
                         id=\#(todoId)
                     RETURNING
