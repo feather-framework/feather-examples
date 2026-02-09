@@ -238,12 +238,12 @@ public struct Client: APIProtocol {
             }
         )
     }
-    /// - Remark: HTTP `PUT /todos/{todoId}`.
-    /// - Remark: Generated from `#/paths//todos/{todoId}/put(updateTodo)`.
-    public func updateTodo(_ input: Operations.UpdateTodo.Input) async throws -> Operations.UpdateTodo.Output {
+    /// - Remark: HTTP `PATCH /todos/{todoId}`.
+    /// - Remark: Generated from `#/paths//todos/{todoId}/patch(patchTodo)`.
+    public func patchTodo(_ input: Operations.PatchTodo.Input) async throws -> Operations.PatchTodo.Output {
         try await client.send(
             input: input,
-            forOperation: Operations.UpdateTodo.id,
+            forOperation: Operations.PatchTodo.id,
             serializer: { input in
                 let path = try converter.renderedPath(
                     template: "/todos/{}",
@@ -253,7 +253,7 @@ public struct Client: APIProtocol {
                 )
                 var request: HTTPTypes.HTTPRequest = .init(
                     soar_path: path,
-                    method: .put
+                    method: .patch
                 )
                 suppressMutabilityWarning(&request)
                 converter.setAcceptHeader(
@@ -313,12 +313,12 @@ public struct Client: APIProtocol {
             }
         )
     }
-    /// - Remark: HTTP `PATCH /todos/{todoId}`.
-    /// - Remark: Generated from `#/paths//todos/{todoId}/patch(patchTodo)`.
-    public func patchTodo(_ input: Operations.PatchTodo.Input) async throws -> Operations.PatchTodo.Output {
+    /// - Remark: HTTP `PUT /todos/{todoId}`.
+    /// - Remark: Generated from `#/paths//todos/{todoId}/put(updateTodo)`.
+    public func updateTodo(_ input: Operations.UpdateTodo.Input) async throws -> Operations.UpdateTodo.Output {
         try await client.send(
             input: input,
-            forOperation: Operations.PatchTodo.id,
+            forOperation: Operations.UpdateTodo.id,
             serializer: { input in
                 let path = try converter.renderedPath(
                     template: "/todos/{}",
@@ -328,7 +328,7 @@ public struct Client: APIProtocol {
                 )
                 var request: HTTPTypes.HTTPRequest = .init(
                     soar_path: path,
-                    method: .patch
+                    method: .put
                 )
                 suppressMutabilityWarning(&request)
                 converter.setAcceptHeader(
@@ -627,12 +627,12 @@ public struct Client: APIProtocol {
             }
         )
     }
-    /// - Remark: HTTP `PUT /lists/{listId}`.
-    /// - Remark: Generated from `#/paths//lists/{listId}/put(updateList)`.
-    public func updateList(_ input: Operations.UpdateList.Input) async throws -> Operations.UpdateList.Output {
+    /// - Remark: HTTP `PATCH /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/patch(patchList)`.
+    public func patchList(_ input: Operations.PatchList.Input) async throws -> Operations.PatchList.Output {
         try await client.send(
             input: input,
-            forOperation: Operations.UpdateList.id,
+            forOperation: Operations.PatchList.id,
             serializer: { input in
                 let path = try converter.renderedPath(
                     template: "/lists/{}",
@@ -642,7 +642,7 @@ public struct Client: APIProtocol {
                 )
                 var request: HTTPTypes.HTTPRequest = .init(
                     soar_path: path,
-                    method: .put
+                    method: .patch
                 )
                 suppressMutabilityWarning(&request)
                 converter.setAcceptHeader(
@@ -702,12 +702,12 @@ public struct Client: APIProtocol {
             }
         )
     }
-    /// - Remark: HTTP `PATCH /lists/{listId}`.
-    /// - Remark: Generated from `#/paths//lists/{listId}/patch(patchList)`.
-    public func patchList(_ input: Operations.PatchList.Input) async throws -> Operations.PatchList.Output {
+    /// - Remark: HTTP `PUT /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/put(updateList)`.
+    public func updateList(_ input: Operations.UpdateList.Input) async throws -> Operations.UpdateList.Output {
         try await client.send(
             input: input,
-            forOperation: Operations.PatchList.id,
+            forOperation: Operations.UpdateList.id,
             serializer: { input in
                 let path = try converter.renderedPath(
                     template: "/lists/{}",
@@ -717,7 +717,7 @@ public struct Client: APIProtocol {
                 )
                 var request: HTTPTypes.HTTPRequest = .init(
                     soar_path: path,
-                    method: .patch
+                    method: .put
                 )
                 suppressMutabilityWarning(&request)
                 converter.setAcceptHeader(

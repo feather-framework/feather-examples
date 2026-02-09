@@ -65,17 +65,6 @@ extension APIProtocol {
         )
         try transport.register(
             {
-                try await server.updateTodo(
-                    request: $0,
-                    body: $1,
-                    metadata: $2
-                )
-            },
-            method: .put,
-            path: server.apiPathComponentsWithServerPrefix("/todos/{todoId}")
-        )
-        try transport.register(
-            {
                 try await server.patchTodo(
                     request: $0,
                     body: $1,
@@ -83,6 +72,17 @@ extension APIProtocol {
                 )
             },
             method: .patch,
+            path: server.apiPathComponentsWithServerPrefix("/todos/{todoId}")
+        )
+        try transport.register(
+            {
+                try await server.updateTodo(
+                    request: $0,
+                    body: $1,
+                    metadata: $2
+                )
+            },
+            method: .put,
             path: server.apiPathComponentsWithServerPrefix("/todos/{todoId}")
         )
         try transport.register(
@@ -131,17 +131,6 @@ extension APIProtocol {
         )
         try transport.register(
             {
-                try await server.updateList(
-                    request: $0,
-                    body: $1,
-                    metadata: $2
-                )
-            },
-            method: .put,
-            path: server.apiPathComponentsWithServerPrefix("/lists/{listId}")
-        )
-        try transport.register(
-            {
                 try await server.patchList(
                     request: $0,
                     body: $1,
@@ -149,6 +138,17 @@ extension APIProtocol {
                 )
             },
             method: .patch,
+            path: server.apiPathComponentsWithServerPrefix("/lists/{listId}")
+        )
+        try transport.register(
+            {
+                try await server.updateList(
+                    request: $0,
+                    body: $1,
+                    metadata: $2
+                )
+            },
+            method: .put,
             path: server.apiPathComponentsWithServerPrefix("/lists/{listId}")
         )
         try transport.register(
@@ -372,9 +372,9 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             }
         )
     }
-    /// - Remark: HTTP `PUT /todos/{todoId}`.
-    /// - Remark: Generated from `#/paths//todos/{todoId}/put(updateTodo)`.
-    func updateTodo(
+    /// - Remark: HTTP `PATCH /todos/{todoId}`.
+    /// - Remark: Generated from `#/paths//todos/{todoId}/patch(patchTodo)`.
+    func patchTodo(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -383,19 +383,19 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.UpdateTodo.id,
+            forOperation: Operations.PatchTodo.id,
             using: {
-                APIHandler.updateTodo($0)
+                APIHandler.patchTodo($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.UpdateTodo.Input.Path = .init(todoId: try converter.getPathParameterAsURI(
+                let path: Operations.PatchTodo.Input.Path = .init(todoId: try converter.getPathParameterAsURI(
                     in: metadata.pathParameters,
                     name: "todoId",
                     as: Components.Parameters.TodoIdParameter.self
                 ))
-                let headers: Operations.UpdateTodo.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
+                let headers: Operations.PatchTodo.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
                 let contentType = converter.extractContentTypeIfPresent(in: request.headerFields)
-                let body: Components.RequestBodies.TodoUpdateRequestBody
+                let body: Components.RequestBodies.TodoPatchRequestBody
                 let chosenContentType = try converter.bestContentType(
                     received: contentType,
                     options: [
@@ -405,7 +405,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 switch chosenContentType {
                 case "application/json":
                     body = try await converter.getRequiredRequestBodyAsJSON(
-                        Components.Schemas.TodoUpdateSchema.self,
+                        Components.Schemas.TodoPatchSchema.self,
                         from: requestBody,
                         transforming: { value in
                             .json(value)
@@ -414,7 +414,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 default:
                     preconditionFailure("bestContentType chose an invalid content type.")
                 }
-                return Operations.UpdateTodo.Input(
+                return Operations.PatchTodo.Input(
                     path: path,
                     headers: headers,
                     body: body
@@ -461,9 +461,9 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             }
         )
     }
-    /// - Remark: HTTP `PATCH /todos/{todoId}`.
-    /// - Remark: Generated from `#/paths//todos/{todoId}/patch(patchTodo)`.
-    func patchTodo(
+    /// - Remark: HTTP `PUT /todos/{todoId}`.
+    /// - Remark: Generated from `#/paths//todos/{todoId}/put(updateTodo)`.
+    func updateTodo(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -472,19 +472,19 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.PatchTodo.id,
+            forOperation: Operations.UpdateTodo.id,
             using: {
-                APIHandler.patchTodo($0)
+                APIHandler.updateTodo($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.PatchTodo.Input.Path = .init(todoId: try converter.getPathParameterAsURI(
+                let path: Operations.UpdateTodo.Input.Path = .init(todoId: try converter.getPathParameterAsURI(
                     in: metadata.pathParameters,
                     name: "todoId",
                     as: Components.Parameters.TodoIdParameter.self
                 ))
-                let headers: Operations.PatchTodo.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
+                let headers: Operations.UpdateTodo.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
                 let contentType = converter.extractContentTypeIfPresent(in: request.headerFields)
-                let body: Components.RequestBodies.TodoPatchRequestBody
+                let body: Components.RequestBodies.TodoUpdateRequestBody
                 let chosenContentType = try converter.bestContentType(
                     received: contentType,
                     options: [
@@ -494,7 +494,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 switch chosenContentType {
                 case "application/json":
                     body = try await converter.getRequiredRequestBodyAsJSON(
-                        Components.Schemas.TodoPatchSchema.self,
+                        Components.Schemas.TodoUpdateSchema.self,
                         from: requestBody,
                         transforming: { value in
                             .json(value)
@@ -503,7 +503,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 default:
                     preconditionFailure("bestContentType chose an invalid content type.")
                 }
-                return Operations.PatchTodo.Input(
+                return Operations.UpdateTodo.Input(
                     path: path,
                     headers: headers,
                     body: body
@@ -797,9 +797,9 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             }
         )
     }
-    /// - Remark: HTTP `PUT /lists/{listId}`.
-    /// - Remark: Generated from `#/paths//lists/{listId}/put(updateList)`.
-    func updateList(
+    /// - Remark: HTTP `PATCH /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/patch(patchList)`.
+    func patchList(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -808,19 +808,19 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.UpdateList.id,
+            forOperation: Operations.PatchList.id,
             using: {
-                APIHandler.updateList($0)
+                APIHandler.patchList($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.UpdateList.Input.Path = .init(listId: try converter.getPathParameterAsURI(
+                let path: Operations.PatchList.Input.Path = .init(listId: try converter.getPathParameterAsURI(
                     in: metadata.pathParameters,
                     name: "listId",
                     as: Components.Parameters.ListIdParameter.self
                 ))
-                let headers: Operations.UpdateList.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
+                let headers: Operations.PatchList.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
                 let contentType = converter.extractContentTypeIfPresent(in: request.headerFields)
-                let body: Components.RequestBodies.ListUpdateRequestBody
+                let body: Components.RequestBodies.ListPatchRequestBody
                 let chosenContentType = try converter.bestContentType(
                     received: contentType,
                     options: [
@@ -830,7 +830,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 switch chosenContentType {
                 case "application/json":
                     body = try await converter.getRequiredRequestBodyAsJSON(
-                        Components.Schemas.ListUpdateSchema.self,
+                        Components.Schemas.ListPatchSchema.self,
                         from: requestBody,
                         transforming: { value in
                             .json(value)
@@ -839,7 +839,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 default:
                     preconditionFailure("bestContentType chose an invalid content type.")
                 }
-                return Operations.UpdateList.Input(
+                return Operations.PatchList.Input(
                     path: path,
                     headers: headers,
                     body: body
@@ -886,9 +886,9 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             }
         )
     }
-    /// - Remark: HTTP `PATCH /lists/{listId}`.
-    /// - Remark: Generated from `#/paths//lists/{listId}/patch(patchList)`.
-    func patchList(
+    /// - Remark: HTTP `PUT /lists/{listId}`.
+    /// - Remark: Generated from `#/paths//lists/{listId}/put(updateList)`.
+    func updateList(
         request: HTTPTypes.HTTPRequest,
         body: OpenAPIRuntime.HTTPBody?,
         metadata: OpenAPIRuntime.ServerRequestMetadata
@@ -897,19 +897,19 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
             request: request,
             requestBody: body,
             metadata: metadata,
-            forOperation: Operations.PatchList.id,
+            forOperation: Operations.UpdateList.id,
             using: {
-                APIHandler.patchList($0)
+                APIHandler.updateList($0)
             },
             deserializer: { request, requestBody, metadata in
-                let path: Operations.PatchList.Input.Path = .init(listId: try converter.getPathParameterAsURI(
+                let path: Operations.UpdateList.Input.Path = .init(listId: try converter.getPathParameterAsURI(
                     in: metadata.pathParameters,
                     name: "listId",
                     as: Components.Parameters.ListIdParameter.self
                 ))
-                let headers: Operations.PatchList.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
+                let headers: Operations.UpdateList.Input.Headers = .init(accept: try converter.extractAcceptHeaderIfPresent(in: request.headerFields))
                 let contentType = converter.extractContentTypeIfPresent(in: request.headerFields)
-                let body: Components.RequestBodies.ListPatchRequestBody
+                let body: Components.RequestBodies.ListUpdateRequestBody
                 let chosenContentType = try converter.bestContentType(
                     received: contentType,
                     options: [
@@ -919,7 +919,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 switch chosenContentType {
                 case "application/json":
                     body = try await converter.getRequiredRequestBodyAsJSON(
-                        Components.Schemas.ListPatchSchema.self,
+                        Components.Schemas.ListUpdateSchema.self,
                         from: requestBody,
                         transforming: { value in
                             .json(value)
@@ -928,7 +928,7 @@ fileprivate extension UniversalServer where APIHandler: APIProtocol {
                 default:
                     preconditionFailure("bestContentType chose an invalid content type.")
                 }
-                return Operations.PatchList.Input(
+                return Operations.UpdateList.Input(
                     path: path,
                     headers: headers,
                     body: body

@@ -286,7 +286,7 @@ struct ExampleAPIController: APIProtocol {
                     INSERT INTO 
                         todos (id, name, is_completed, list_id)
                     VALUES 
-                        (\#(todoId), \#(payload.name), \#(payload.isCompleted), \#(payload.listId))
+                        (\#(todoId), \#(payload.name), \#(payload.isCompleted ?? false), \#(payload.listId))
                     RETURNING
                         *;
                     """#
@@ -351,7 +351,7 @@ struct ExampleAPIController: APIProtocol {
                         todos 
                     SET
                         name=\#(payload.name),
-                        is_completed=\#(payload.isCompleted),
+                        is_completed=\#(payload.isCompleted ?? false),
                         list_id=\#(payload.listId)
                     WHERE
                         id=\#(todoId)
