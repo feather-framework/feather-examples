@@ -27,7 +27,7 @@ paths:
       - Todos
       operationId: createTodo
       requestBody:
-        $ref: '#/components/requestBodies/TodoRequestBody'
+        $ref: '#/components/requestBodies/TodoCreateRequestBody'
       responses:
         201:
           $ref: '#/components/responses/TodoResponse'
@@ -60,7 +60,7 @@ paths:
       parameters:
       - $ref: '#/components/parameters/TodoIdParameter'
       requestBody:
-        $ref: '#/components/requestBodies/TodoRequestBody'
+        $ref: '#/components/requestBodies/TodoUpdateRequestBody'
       responses:
         200:
           $ref: '#/components/responses/TodoResponse'
@@ -82,6 +82,23 @@ paths:
           headers: {}
         404:
           $ref: '#/components/responses/NotFoundResponse'
+    patch:
+      tags:
+      - Todos
+      operationId: patchTodo
+      parameters:
+      - $ref: '#/components/parameters/TodoIdParameter'
+      requestBody:
+        $ref: '#/components/requestBodies/TodoPatchRequestBody'
+      responses:
+        200:
+          $ref: '#/components/responses/TodoResponse'
+        400:
+          $ref: '#/components/responses/BadInputResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+        422:
+          $ref: '#/components/responses/UnprocessableEntityResponse'
   /lists:
     get:
       tags:
@@ -99,7 +116,7 @@ paths:
       - Lists
       operationId: createList
       requestBody:
-        $ref: '#/components/requestBodies/ListRequestBody'
+        $ref: '#/components/requestBodies/ListCreateRequestBody'
       responses:
         201:
           $ref: '#/components/responses/ListResponse'
@@ -132,7 +149,7 @@ paths:
       parameters:
       - $ref: '#/components/parameters/ListIdParameter'
       requestBody:
-        $ref: '#/components/requestBodies/ListRequestBody'
+        $ref: '#/components/requestBodies/ListUpdateRequestBody'
       responses:
         200:
           $ref: '#/components/responses/ListResponse'
@@ -154,6 +171,23 @@ paths:
           headers: {}
         404:
           $ref: '#/components/responses/NotFoundResponse'
+    patch:
+      tags:
+      - Lists
+      operationId: patchList
+      parameters:
+      - $ref: '#/components/parameters/ListIdParameter'
+      requestBody:
+        $ref: '#/components/requestBodies/ListPatchRequestBody'
+      responses:
+        200:
+          $ref: '#/components/responses/ListResponse'
+        400:
+          $ref: '#/components/responses/BadInputResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+        422:
+          $ref: '#/components/responses/UnprocessableEntityResponse'
 components:
   schemas:
     TodoSchema:
@@ -199,8 +233,28 @@ components:
           $ref: '#/components/schemas/ListIdField'
       required:
       - name
-      - isCompleted
       - listId
+    TodoUpdateSchema:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/TodoNameField'
+        isCompleted:
+          $ref: '#/components/schemas/TodoIsCompletedField'
+        listId:
+          $ref: '#/components/schemas/ListIdField'
+      required:
+      - name
+      - listId
+    TodoPatchSchema:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/TodoNameField'
+        isCompleted:
+          $ref: '#/components/schemas/TodoIsCompletedField'
+        listId:
+          $ref: '#/components/schemas/ListIdField'
     ListSchema:
       type: object
       properties:
@@ -222,6 +276,18 @@ components:
           $ref: '#/components/schemas/ListNameField'
       required:
       - name
+    ListUpdateSchema:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/ListNameField'
+      required:
+      - name
+    ListPatchSchema:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/ListNameField'
   responses:
     TodoListResponse:
       description: Todo list response
@@ -280,15 +346,39 @@ components:
         $ref: '#/components/schemas/ListIdField'
       description: List identifier
   requestBodies:
-    TodoRequestBody:
+    TodoCreateRequestBody:
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/TodoCreateSchema'
       required: true
-    ListRequestBody:
+    TodoUpdateRequestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TodoUpdateSchema'
+      required: true
+    TodoPatchRequestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TodoPatchSchema'
+      required: true
+    ListCreateRequestBody:
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ListCreateSchema'
+      required: true
+    ListUpdateRequestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListUpdateSchema'
+      required: true
+    ListPatchRequestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListPatchSchema'
       required: true

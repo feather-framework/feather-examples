@@ -39,7 +39,7 @@ let package = Package(
         .executable(name: "ExampleOpenAPIGenerator", targets: ["ExampleOpenAPIGenerator"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/feather-framework/feather-openapi", exact: "1.0.0-beta.3"),
+        .package(url: "https://github.com/feather-framework/feather-openapi", exact: "1.0.0-beta.4"),
         .package(url: "https://github.com/mattpolzin/OpenAPIKit", from: "5.0.0"),
         .package(url: "https://github.com/jpsim/Yams", from: "6.2.0"),
 

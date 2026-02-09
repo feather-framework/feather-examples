@@ -15,5 +15,6 @@ struct ListPathItems: PathItemRepresentable {
 struct ListIdPathItems: PathItemRepresentable {
     var get: OperationRepresentable? { ListGetOperation() }
     var put: OperationRepresentable? { ListUpdateOperation() }
+    var patch: OperationRepresentable? { ListPatchOperation() }
     var delete: OperationRepresentable? { ListDeleteOperation() }
 }

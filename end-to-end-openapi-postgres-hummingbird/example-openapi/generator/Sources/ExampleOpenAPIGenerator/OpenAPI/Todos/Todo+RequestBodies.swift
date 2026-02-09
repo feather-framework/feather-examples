@@ -8,10 +8,26 @@
 import FeatherOpenAPI
 import OpenAPIKit30
 
-struct TodoRequestBody: RequestBodyRepresentable {
+struct TodoCreateRequestBody: RequestBodyRepresentable {
     var contentMap: ContentMap {
         [
             .json: Content(TodoCreateSchema().reference())
+        ]
+    }
+}
+
+struct TodoUpdateRequestBody: RequestBodyRepresentable {
+    var contentMap: ContentMap {
+        [
+            .json: Content(TodoUpdateSchema().reference())
+        ]
+    }
+}
+
+struct TodoPatchRequestBody: RequestBodyRepresentable {
+    var contentMap: ContentMap {
+        [
+            .json: Content(TodoPatchSchema().reference())
         ]
     }
 }

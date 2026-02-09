@@ -22,10 +22,20 @@ struct ListCreateSchema: ObjectSchemaRepresentable {
             "name": ListNameField().reference(),
         ]
     }
+}
 
-    var requiredProperties: [String] {
+struct ListUpdateSchema: ObjectSchemaRepresentable {
+    var propertyMap: SchemaMap {
         [
-            "name",
+            "name": ListNameField().reference(),
+        ]
+    }
+}
+
+struct ListPatchSchema: ObjectSchemaRepresentable {
+    var propertyMap: SchemaMap {
+        [
+            "name": ListNameField().reference(required: false),
         ]
     }
 }
@@ -35,13 +45,6 @@ struct ListSchema: ObjectSchemaRepresentable {
         [
             "id": ListIdField().reference(),
             "name": ListNameField().reference(),
-        ]
-    }
-
-    var requiredProperties: [String] {
-        [
-            "id",
-            "name",
         ]
     }
 }

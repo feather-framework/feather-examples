@@ -35,8 +35,7 @@ struct Entrypoint {
             .appending(path: "openapi@v3_1_0.yaml")
         
         let v320YAMLFileURL = openapiOutputURL
-            .appending(path: "openapi@v3_2_0.yaml")
-        
+            .appending(path: "openapi@v3_2_0.yaml")        
 
         let result300 = try encoder.encode(openAPIdoc)
         try result300.write(

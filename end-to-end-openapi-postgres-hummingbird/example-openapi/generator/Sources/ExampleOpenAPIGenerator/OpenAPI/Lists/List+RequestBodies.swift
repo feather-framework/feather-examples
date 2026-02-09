@@ -8,10 +8,26 @@
 import FeatherOpenAPI
 import OpenAPIKit30
 
-struct ListRequestBody: RequestBodyRepresentable {
+struct ListCreateRequestBody: RequestBodyRepresentable {
     var contentMap: ContentMap {
         [
             .json: Content(ListCreateSchema().reference())
+        ]
+    }
+}
+
+struct ListUpdateRequestBody: RequestBodyRepresentable {
+    var contentMap: ContentMap {
+        [
+            .json: Content(ListUpdateSchema().reference())
+        ]
+    }
+}
+
+struct ListPatchRequestBody: RequestBodyRepresentable {
+    var contentMap: ContentMap {
+        [
+            .json: Content(ListPatchSchema().reference())
         ]
     }
 }

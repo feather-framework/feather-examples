@@ -1,13 +1,13 @@
 {
-  "originHash" : "3fd31123e122d1b26d39bfff1446645a4af58747f1efe6b0ce08f4926ceb637e",
+  "originHash" : "18024750947b4a9b51e3753a29329b4e860d1d56209a1731abe69ac53ab9bd4f",
   "pins" : [
     {
       "identity" : "feather-openapi",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/feather-framework/feather-openapi",
       "state" : {
-        "revision" : "53179d95a4db8d8f36db85b01f6af090a1cedc32",
-        "version" : "1.0.0-beta.3"
+        "revision" : "b55312ef35bfdb40b8de5d93c914dce73b203874",
+        "version" : "1.0.0-beta.4"
       }
     },
     {

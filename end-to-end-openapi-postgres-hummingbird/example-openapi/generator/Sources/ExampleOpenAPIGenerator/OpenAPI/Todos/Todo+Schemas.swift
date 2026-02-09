@@ -24,15 +24,28 @@ struct TodoCreateSchema: ObjectSchemaRepresentable {
     var propertyMap: SchemaMap {
         [
             "name": TodoNameField().reference(),
-            "isCompleted": TodoIsCompletedField().reference(),
+            "isCompleted": TodoIsCompletedField().reference(required: false),
             "listId": ListIdField().reference(),
         ]
     }
+}
 
-    var requiredProperties: [String] {
+struct TodoUpdateSchema: ObjectSchemaRepresentable {
+    var propertyMap: SchemaMap {
         [
-            "name",
-            "isCompleted",
+            "name": TodoNameField().reference(),
+            "isCompleted": TodoIsCompletedField().reference(required: false),
+            "listId": ListIdField().reference(),
+        ]
+    }
+}
+
+struct TodoPatchSchema: ObjectSchemaRepresentable {
+    var propertyMap: SchemaMap {
+        [
+            "name": TodoNameField().reference(required: false),
+            "isCompleted": TodoIsCompletedField().reference(required: false),
+            "listId": ListIdField().reference(required: false),
         ]
     }
 }
@@ -44,14 +57,6 @@ struct TodoSchema: ObjectSchemaRepresentable {
             "name": TodoNameField().reference(),
             "isCompleted": TodoIsCompletedField().reference(),
             "listId": ListIdField().reference(),
-        ]
-    }
-
-    var requiredProperties: [String] {
-        [
-            "id",
-            "name",
-            "isCompleted",
         ]
     }
 }

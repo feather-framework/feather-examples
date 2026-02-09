@@ -11,7 +11,7 @@ import OpenAPIKit30
 struct TodoCreateOperation: OperationRepresentable {
     var tags: [TagRepresentable] { [TodoTag()] }
     var operationId: String? { "createTodo" }
-    var requestBody: RequestBodyRepresentable? { TodoRequestBody().reference() }
+    var requestBody: RequestBodyRepresentable? { TodoCreateRequestBody().reference() }
     var responseMap: ResponseMap {
         [
             201: TodoResponse().reference(),
@@ -56,7 +56,24 @@ struct TodoUpdateOperation: OperationRepresentable {
     var parameters: [ParameterRepresentable] {
         [TodoIdParameter().reference()]
     }
-    var requestBody: RequestBodyRepresentable? { TodoRequestBody().reference() }
+    var requestBody: RequestBodyRepresentable? { TodoUpdateRequestBody().reference() }
+    var responseMap: ResponseMap {
+        [
+            200: TodoResponse().reference(),
+            400: BadInputResponse().reference(),
+            404: NotFoundResponse().reference(),
+            422: UnprocessableEntityResponse().reference(),
+        ]
+    }
+}
+
+struct TodoPatchOperation: OperationRepresentable {
+    var tags: [TagRepresentable] { [TodoTag()] }
+    var operationId: String? { "patchTodo" }
+    var parameters: [ParameterRepresentable] {
+        [TodoIdParameter().reference()]
+    }
+    var requestBody: RequestBodyRepresentable? { TodoPatchRequestBody().reference() }
     var responseMap: ResponseMap {
         [
             200: TodoResponse().reference(),

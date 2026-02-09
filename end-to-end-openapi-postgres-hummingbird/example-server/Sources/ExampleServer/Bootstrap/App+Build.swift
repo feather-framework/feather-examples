@@ -18,7 +18,7 @@ func buildApplication(
         logger.logLevel = reader.string(
             forKey: "log.level",
             as: Logger.Level.self,
-            default: .trace
+            default: .info
         )
         return logger
     }()

@@ -24,24 +24,7 @@ struct Migrator: Sendable {
                         list_id TEXT NOT NULL REFERENCES lists(id)
                     );
                     """#
-            ) { _ in }
-            
-//            try await connection.run(
-//                query: #"""
-//                    INSERT INTO todos 
-//                    (
-//                        id, 
-//                        name, 
-//                        is_completed
-//                    )
-//                    VALUES
-//                    ( 
-//                        '5D2wACKWJHdSfrKYbre9A',
-//                        'Get Milk',
-//                        false
-//                    );
-//                    """#
-//            )
+            ) { _ in }            
         }
     }
 }

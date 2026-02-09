@@ -56,7 +56,7 @@ struct ExampleAPIController: APIProtocol {
         _ input: Operations.UpdateList.Input
     ) async throws -> Operations.UpdateList.Output {
         let listId = input.path.listId
-        let payload: Components.Schemas.ListCreateSchema
+        let payload: Components.Schemas.ListUpdateSchema
         switch input.body {
         case let .json(value):
             payload = value
@@ -73,6 +73,62 @@ struct ExampleAPIController: APIProtocol {
                         lists 
                     SET
                         name=\#(payload.name)
+                    WHERE
+                        id=\#(listId)
+                    RETURNING
+                        *;
+                    """#
+            ) { sequence in
+                guard let row = try await sequence.collect().first else {
+                    return .notFound(.init())
+                }
+                let list = try Components.Schemas.ListSchema.decode(from: row)
+
+                return .ok(
+                    .init(
+                        body: .json(list)
+                    )
+                )
+            }
+        }
+    }
+
+    func patchList(
+        _ input: Operations.PatchList.Input
+    ) async throws -> Operations.PatchList.Output {
+        let listId = input.path.listId
+        let payload: Components.Schemas.ListPatchSchema
+        switch input.body {
+        case let .json(value):
+            payload = value
+        }
+
+        return try await database.withConnection { connection in
+            let existing = try await connection.run(
+                query: #"""
+                    SELECT * FROM lists WHERE id=\#(listId) LIMIT 1;
+                    """#
+            ) { sequence in
+                try await sequence.collect().first
+            }
+
+            guard let existing else {
+                return .notFound(.init())
+            }
+
+            let current = try Components.Schemas.ListSchema.decode(from: existing)
+            let name = payload.name ?? current.name
+
+            guard !name.isEmpty else {
+                return .unprocessableContent(.init())
+            }
+
+            return try await connection.run(
+                query: #"""
+                    UPDATE 
+                        lists 
+                    SET
+                        name=\#(name)
                     WHERE
                         id=\#(listId)
                     RETURNING
@@ -230,7 +286,7 @@ struct ExampleAPIController: APIProtocol {
                     INSERT INTO 
                         todos (id, name, is_completed, list_id)
                     VALUES 
-                        (\#(todoId), \#(payload.name), \#(String(payload.isCompleted)), \#(payload.listId))
+                        (\#(todoId), \#(payload.name), \#(payload.isCompleted), \#(payload.listId))
                     RETURNING
                         *;
                     """#
@@ -278,7 +334,7 @@ struct ExampleAPIController: APIProtocol {
         _ input: Operations.UpdateTodo.Input
     ) async throws -> Operations.UpdateTodo.Output {
         let todoId = input.path.todoId
-        let payload: Components.Schemas.TodoCreateSchema
+        let payload: Components.Schemas.TodoUpdateSchema
         switch input.body {
         case let .json(value):
             payload = value
@@ -295,8 +351,68 @@ struct ExampleAPIController: APIProtocol {
                         todos 
                     SET
                         name=\#(payload.name),
-                        is_completed=\#(String(payload.isCompleted)),
+                        is_completed=\#(payload.isCompleted),
                         list_id=\#(payload.listId)
+                    WHERE
+                        id=\#(todoId)
+                    RETURNING
+                        *;
+                    """#
+            ) { sequence in
+                guard let row = try await sequence.collect().first else {
+                    return .notFound(.init())
+                }
+                let todo = try Components.Schemas.TodoSchema.decode(from: row)
+
+                return .ok(
+                    .init(
+                        body: .json(todo)
+                    )
+                )
+            }
+        }
+    }
+
+    func patchTodo(
+        _ input: Operations.PatchTodo.Input
+    ) async throws -> Operations.PatchTodo.Output {
+        let todoId = input.path.todoId
+        let payload: Components.Schemas.TodoPatchSchema
+        switch input.body {
+        case let .json(value):
+            payload = value
+        }
+
+        return try await database.withConnection { connection in
+            let existing = try await connection.run(
+                query: #"""
+                    SELECT * FROM todos WHERE id=\#(todoId) LIMIT 1;
+                    """#
+            ) { sequence in
+                try await sequence.collect().first
+            }
+
+            guard let existing else {
+                return .notFound(.init())
+            }
+
+            let current = try Components.Schemas.TodoSchema.decode(from: existing)
+            let name = payload.name ?? current.name
+            let isCompleted = payload.isCompleted ?? current.isCompleted
+            let listId = payload.listId ?? current.listId
+
+            guard !name.isEmpty else {
+                return .unprocessableContent(.init())
+            }
+
+            return try await connection.run(
+                query: #"""
+                    UPDATE 
+                        todos 
+                    SET
+                        name=\#(name),
+                        is_completed=\#(isCompleted),
+                        list_id=\#(listId)
                     WHERE
                         id=\#(todoId)
                     RETURNING

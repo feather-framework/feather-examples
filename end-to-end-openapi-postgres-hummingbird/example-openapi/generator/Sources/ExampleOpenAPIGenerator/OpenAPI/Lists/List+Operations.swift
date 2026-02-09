@@ -11,7 +11,7 @@ import OpenAPIKit30
 struct ListCreateOperation: OperationRepresentable {
     var tags: [TagRepresentable] { [ListTag()] }
     var operationId: String? { "createList" }
-    var requestBody: RequestBodyRepresentable? { ListRequestBody().reference() }
+    var requestBody: RequestBodyRepresentable? { ListCreateRequestBody().reference() }
     var responseMap: ResponseMap {
         [
             201: ListResponse().reference(),
@@ -56,7 +56,24 @@ struct ListUpdateOperation: OperationRepresentable {
     var parameters: [ParameterRepresentable] {
         [ListIdParameter().reference()]
     }
-    var requestBody: RequestBodyRepresentable? { ListRequestBody().reference() }
+    var requestBody: RequestBodyRepresentable? { ListUpdateRequestBody().reference() }
+    var responseMap: ResponseMap {
+        [
+            200: ListResponse().reference(),
+            400: BadInputResponse().reference(),
+            404: NotFoundResponse().reference(),
+            422: UnprocessableEntityResponse().reference(),
+        ]
+    }
+}
+
+struct ListPatchOperation: OperationRepresentable {
+    var tags: [TagRepresentable] { [ListTag()] }
+    var operationId: String? { "patchList" }
+    var parameters: [ParameterRepresentable] {
+        [ListIdParameter().reference()]
+    }
+    var requestBody: RequestBodyRepresentable? { ListPatchRequestBody().reference() }
     var responseMap: ResponseMap {
         [
             200: ListResponse().reference(),

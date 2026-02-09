@@ -15,5 +15,6 @@ struct TodoPathItems: PathItemRepresentable {
 struct TodoIdPathItems: PathItemRepresentable {
     var get: OperationRepresentable? { TodoGetOperation() }
     var put: OperationRepresentable? { TodoUpdateOperation() }
+    var patch: OperationRepresentable? { TodoPatchOperation() }
     var delete: OperationRepresentable? { TodoDeleteOperation() }
 }
