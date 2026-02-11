@@ -5,6 +5,8 @@ import FeatherDatabase
 import FeatherPostgresDatabase
 import SystemPackage
 import Foundation
+import ServiceLifecycle
+import UnixSignals
 
 @main
 struct Entrypoint {
@@ -70,17 +72,24 @@ struct Entrypoint {
             database: database
         )
 
-        
-        try await withThrowingTaskGroup(of: Void.self) { group in
-            group.addTask {
-                await client.run()
-            }
-            group.addTask {
-                try await migrator.run()
-                print("✅ Migration ready.")
-            }
-            try await group.next()
-            group.cancelAll()
-        }
+        let serviceGroup = ServiceGroup(
+            configuration: .init(
+                services: [
+                    .init(
+                        service: client
+                    ),
+                    .init(
+                        service: MigrationService(migrator: migrator),
+                        successTerminationBehavior: .gracefullyShutdownGroup,
+                        failureTerminationBehavior: .gracefullyShutdownGroup
+                    ),
+                ],
+                gracefulShutdownSignals: [.sigterm, .sigint],
+                logger: logger
+            )
+        )
+        try await serviceGroup.run()
     }
 }
+
+
