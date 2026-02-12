@@ -1,5 +1,5 @@
 {
-  "originHash" : "87d148c76b022d06a3f7c4c1ba1a2143c4f811046c3bb9dc9652cf67ad36d832",
+  "originHash" : "bcc92950d220dcdc8f3d7be8532389f395ad13bc1034e2543577e229ded27911",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -11,12 +11,30 @@
       }
     },
     {
+      "identity" : "feather-hummingbird-spec",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/feather-framework/feather-hummingbird-spec",
+      "state" : {
+        "revision" : "dc1ab008d12fddcb5e5c6e793d792c43bad6e4cf",
+        "version" : "1.0.0-beta.2"
+      }
+    },
+    {
+      "identity" : "feather-spec",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/feather-framework/feather-spec",
+      "state" : {
+        "revision" : "775707a06866af92d81853643a61fcf675c255cb",
+        "version" : "1.0.0-beta.2"
+      }
+    },
+    {
       "identity" : "hummingbird",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hummingbird-project/hummingbird",
       "state" : {
-        "revision" : "960fd08e28e1858e0896410e3a800ff80e112a80",
-        "version" : "2.20.0"
+        "revision" : "328a211b3bdc8bdd41a40a3d4112ed6b79358fa4",
+        "version" : "2.20.1"
       }
     },
     {

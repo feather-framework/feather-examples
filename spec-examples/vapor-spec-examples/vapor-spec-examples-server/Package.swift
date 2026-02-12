@@ -39,10 +39,10 @@ let package = Package(
         .executable(name: "VaporSpecExamplesServer", targets: ["VaporSpecExamplesServer"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor", from: "4.121.2"),
         .package(path: "../../spec-example-openapi"),
-        .package(path: "../../../../feather-vapor-spec"),
-        .package(path: "../../../../feather-spec"),
+        .package(url: "https://github.com/vapor/vapor", from: "4.121.2"),
+        .package(url: "https://github.com/feather-framework/feather-vapor-spec", from: "1.0.0-beta.2"),
+        .package(url: "https://github.com/feather-framework/feather-spec", from: "1.0.0-beta.2"),
     ],
     targets: [
         .executableTarget(

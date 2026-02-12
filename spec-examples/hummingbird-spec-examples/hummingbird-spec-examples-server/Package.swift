@@ -39,17 +39,11 @@ let package = Package(
         .executable(name: "HummingbirdSpecExamplesServer", targets: ["HummingbirdSpecExamplesServer"]),
     ],
     dependencies: [
-        .package(
-            url: "https://github.com/hummingbird-project/hummingbird",
-            from: "2.0.0"
-        ),
-        .package(
-            url: "https://github.com/hummingbird-project/swift-openapi-hummingbird",
-            from: "2.0.1"
-        ),
         .package(path: "../../spec-example-openapi"),
-        .package(path: "../../../../feather-hummingbird-spec"),
-        .package(path: "../../../../feather-spec"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird",from: "2.0.0"),
+        .package(url: "https://github.com/hummingbird-project/swift-openapi-hummingbird", from: "2.0.1"),
+        .package(url: "https://github.com/feather-framework/feather-hummingbird-spec", from: "1.0.0-beta.2"),
+        .package(url: "https://github.com/feather-framework/feather-spec", from: "1.0.0-beta.2"),
     ],
     targets: [
         .executableTarget(
