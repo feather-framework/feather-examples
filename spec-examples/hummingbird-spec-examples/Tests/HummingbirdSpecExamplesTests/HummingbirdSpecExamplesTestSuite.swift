@@ -1,28 +1,31 @@
 import FeatherSpec
 import HTTPTypes
+import SpecExampleOpenAPI
 import OpenAPIRuntime
 import Testing
-import SpecExampleOpenAPI
 
+/// Spec-driven tests for the Hummingbird examples server API.
 @Suite
-struct VaporSpecExamplesServerTestSuite {
+struct HummingbirdSpecExamplesTestSuite {
 
+    /// Covers list and get behaviors for todos.
     @Test
     func testCreateGetAndListTodos() async throws {
-        let (app, runner) = try await makeRunner()
-        defer { Task { await shutdownApp(app) } }
-
+        let runner = try await makeRunner()
         let list = try await createList(runner: runner)
         let created = try await createTodo(runner: runner, listId: list.id)
 
+        // Fetch the created item by id.
         let fetched: Components.Schemas.TodoSchema = try await runSpecJSONReturn(using: runner) {
             GET("todos/\(created.id)")
             Expect(.ok)
         }
 
+        // Validate data integrity.
         #expect(fetched.id == created.id)
         #expect(fetched.name == created.name)
 
+        // Fetch all todos.
         let todos: [Components.Schemas.TodoSchema] = try await runSpecJSONReturn(using: runner) {
             GET("todos")
             Expect(.ok)
@@ -31,20 +34,21 @@ struct VaporSpecExamplesServerTestSuite {
         #expect(todos.contains { $0.id == created.id })
     }
 
+    /// Covers update and patch paths for todos.
     @Test
     func testUpdateAndPatchTodo() async throws {
-        let (app, runner) = try await makeRunner()
-        defer { Task { await shutdownApp(app) } }
-
+        let runner = try await makeRunner()
         let list = try await createList(runner: runner)
         let created = try await createTodo(runner: runner, listId: list.id)
 
+        // Full update payload.
         let updatePayload = Components.Schemas.TodoUpdateSchema(
             name: "task02",
             isCompleted: true,
             listId: list.id
         )
 
+        // Apply PUT update and assert values.
         let updated: Components.Schemas.TodoSchema = try await runSpecJSONReturn(using: runner) {
             PUT("todos/\(created.id)")
             JSONBody(updatePayload)
@@ -59,8 +63,10 @@ struct VaporSpecExamplesServerTestSuite {
         #expect(updated.isCompleted == true)
         #expect(updated.listId == list.id)
 
+        // Partial update payload.
         let patchPayload = Components.Schemas.TodoPatchSchema(name: "task03")
 
+        // Apply PATCH update and validate.
         let patched: Components.Schemas.TodoSchema = try await runSpecJSONReturn(using: runner) {
             PATCH("todos/\(created.id)")
             JSONBody(patchPayload)
@@ -71,30 +77,30 @@ struct VaporSpecExamplesServerTestSuite {
         #expect(patched.listId == list.id)
     }
 
+    /// Covers delete and post-delete fetch for todos.
     @Test
     func testDeleteTodo() async throws {
-        let (app, runner) = try await makeRunner()
-        defer { Task { await shutdownApp(app) } }
-
+        let runner = try await makeRunner()
         let list = try await createList(runner: runner)
         let created = try await createTodo(runner: runner, listId: list.id)
 
+        // Delete the record.
         try await runSpec(using: runner) {
             DELETE("todos/\(created.id)")
             Expect(.noContent)
         }
 
+        // Ensure it no longer exists.
         try await runSpec(using: runner) {
             GET("todos/\(created.id)")
             Expect(.notFound)
         }
     }
 
+    /// Covers missing todo responses.
     @Test
     func testTodoNotFound() async throws {
-        let (app, runner) = try await makeRunner()
-        defer { Task { await shutdownApp(app) } }
-
+        let runner = try await makeRunner()
         try await runSpec(using: runner) {
             GET("todos/missing")
             Expect(.notFound)
@@ -106,11 +112,12 @@ struct VaporSpecExamplesServerTestSuite {
         }
     }
 
+    /// Covers invalid todo payloads for create/update/patch.
     @Test
     func testTodoValidation() async throws {
-        let (app, runner) = try await makeRunner()
-        defer { Task { await shutdownApp(app) } }
+        let runner = try await makeRunner()
 
+        // Create with empty name.
         try await runSpec(using: runner) {
             POST("todos")
             JSONBody(Components.Schemas.TodoCreateSchema(
@@ -121,6 +128,7 @@ struct VaporSpecExamplesServerTestSuite {
             Expect(.unprocessableContent)
         }
 
+        // Create with empty list id.
         try await runSpec(using: runner) {
             POST("todos")
             JSONBody(Components.Schemas.TodoCreateSchema(
@@ -134,6 +142,7 @@ struct VaporSpecExamplesServerTestSuite {
         let list = try await createList(runner: runner)
         let created = try await createTodo(runner: runner, listId: list.id)
 
+        // Update with empty name.
         try await runSpec(using: runner) {
             PUT("todos/\(created.id)")
             JSONBody(Components.Schemas.TodoUpdateSchema(
@@ -144,6 +153,7 @@ struct VaporSpecExamplesServerTestSuite {
             Expect(.unprocessableContent)
         }
 
+        // Patch to invalid empty name.
         try await runSpec(using: runner) {
             PATCH("todos/\(created.id)")
             JSONBody(Components.Schemas.TodoPatchSchema(
@@ -155,21 +165,23 @@ struct VaporSpecExamplesServerTestSuite {
         }
     }
 
+    /// Covers list and get behaviors for lists.
     @Test
     func testCreateGetAndListLists() async throws {
-        let (app, runner) = try await makeRunner()
-        defer { Task { await shutdownApp(app) } }
-
+        let runner = try await makeRunner()
         let created = try await createList(runner: runner, name: "list-alpha")
 
+        // Fetch the created list by id.
         let fetched: Components.Schemas.ListSchema = try await runSpecJSONReturn(using: runner) {
             GET("lists/\(created.id)")
             Expect(.ok)
         }
 
+        // Validate data integrity.
         #expect(fetched.id == created.id)
         #expect(fetched.name == created.name)
 
+        // Fetch all lists.
         let lists: [Components.Schemas.ListSchema] = try await runSpecJSONReturn(using: runner) {
             GET("lists")
             Expect(.ok)
@@ -178,13 +190,13 @@ struct VaporSpecExamplesServerTestSuite {
         #expect(lists.contains { $0.id == created.id })
     }
 
+    /// Covers update and patch paths for lists.
     @Test
     func testUpdateAndPatchList() async throws {
-        let (app, runner) = try await makeRunner()
-        defer { Task { await shutdownApp(app) } }
-
+        let runner = try await makeRunner()
         let created = try await createList(runner: runner, name: "list-alpha")
 
+        // Full update payload.
         let updatePayload = Components.Schemas.ListUpdateSchema(name: "list-beta")
         let updated: Components.Schemas.ListSchema = try await runSpecJSONReturn(using: runner) {
             PUT("lists/\(created.id)")
@@ -192,8 +204,10 @@ struct VaporSpecExamplesServerTestSuite {
             Expect(.ok)
         }
 
+        // Verify update response.
         #expect(updated.name == "list-beta")
 
+        // Partial update payload.
         let patchPayload = Components.Schemas.ListPatchSchema(name: "list-gamma")
         let patched: Components.Schemas.ListSchema = try await runSpecJSONReturn(using: runner) {
             PATCH("lists/\(created.id)")
@@ -201,48 +215,54 @@ struct VaporSpecExamplesServerTestSuite {
             Expect(.ok)
         }
 
+        // Verify patch response.
         #expect(patched.name == "list-gamma")
     }
 
+    /// Covers delete and post-delete fetch for lists.
     @Test
     func testDeleteList() async throws {
-        let (app, runner) = try await makeRunner()
-        defer { Task { await shutdownApp(app) } }
-
+        let runner = try await makeRunner()
         let created = try await createList(runner: runner, name: "list-alpha")
 
+        // Delete the record.
         try await runSpec(using: runner) {
             DELETE("lists/\(created.id)")
             Expect(.noContent)
         }
 
+        // Ensure it no longer exists.
         try await runSpec(using: runner) {
             GET("lists/\(created.id)")
             Expect(.notFound)
         }
     }
 
+    /// Covers missing list responses and invalid payloads.
     @Test
     func testListNotFoundAndValidation() async throws {
-        let (app, runner) = try await makeRunner()
-        defer { Task { await shutdownApp(app) } }
+        let runner = try await makeRunner()
 
+        // Missing list by id.
         try await runSpec(using: runner) {
             GET("lists/missing")
             Expect(.notFound)
         }
 
+        // Missing list deletion.
         try await runSpec(using: runner) {
             DELETE("lists/missing")
             Expect(.notFound)
         }
 
+        // Create with empty name.
         try await runSpec(using: runner) {
             POST("lists")
             JSONBody(Components.Schemas.ListCreateSchema(name: ""))
             Expect(.unprocessableContent)
         }
 
+        // Update with empty name.
         try await runSpec(using: runner) {
             PUT("lists/missing")
             JSONBody(Components.Schemas.ListUpdateSchema(name: ""))
