@@ -76,6 +76,8 @@ let package = Package(
             name: "SMTPExampleTests",
             dependencies: [
                 .target(name: "SMTPExample"),
+                .product(name: "Hummingbird", package: "hummingbird"),
+                .product(name: "HummingbirdTesting", package: "hummingbird"),
                 .product(name: "MailExampleOpenAPI", package: "mail-example-openapi"),
                 .product(name: "FeatherMemoryMail", package: "feather-memory-mail"),
             ],

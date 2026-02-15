@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Accounts - API</title>
+    <title>SMTP Mail API - Swagger</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui.min.css" rel="stylesheet">
@@ -12,8 +12,15 @@
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui-bundle.min.js"></script>
     <script>
         function render() {
+            const search = new URLSearchParams(window.location.search);
+            const specFromQuery = search.get('spec');
+            const specUrl = specFromQuery
+                ?? (window.location.protocol === 'file:'
+                    ? 'http://127.0.0.1:8889/openapi.yaml'
+                    : `${window.location.origin}/openapi.yaml`);
+
             var ui = SwaggerUIBundle({
-                url:  `/openapi.yaml`,
+                url: specUrl,
                 dom_id: '#swagger-ui',
                 docExpansion: 'none',
                 presets: [

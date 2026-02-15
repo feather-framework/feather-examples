@@ -1,12 +1,12 @@
 openapi: 3.0.0
 info:
-  title: Mail API - example
+  title: SMTP Mail API - example
   version: 1.0.0
 tags:
 - name: Mail
   description: Mail sending operations.
 servers:
-- url: http://127.0.0.1:8080/
+- url: http://127.0.0.1:8081/
 paths:
   /mail/send:
     post:

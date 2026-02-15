@@ -3,6 +3,8 @@ import Foundation
 import Hummingbird
 import Logging
 import ServiceLifecycle
+import FeatherMail
+import FeatherSMTPMail
 import NIOSMTP
 
 /// Shared request context type for the example server.
@@ -49,27 +51,48 @@ public func buildApplication(
 
     logger.info("SMTP sender configured with credential authentication")
     let eventLoopGroup = EventLoopGroupProvider.singleton.eventLoopGroup
-
-    let sender = SMTPMailSender(
-        eventLoopGroup: eventLoopGroup,
-        host: host,
-        port: 587,
+    let signInMethod: SignInMethod = .credentials(
         username: username,
-        password: password,
-        security: .startTLS,
+        password: password
+    )
+    let mailClient = SMTPMailClient(
+        configuration: .init(
+            hostname: host,
+            port: 587,
+            signInMethod: signInMethod,
+            security: .startTLS
+        ),
+        mailEncoder: RawMailEncoder(
+            headerDateEncodingStrategy: {
+                formatRFC2822Date(Date())
+            }
+        ),
+        eventLoopGroup: eventLoopGroup,
+        logger: .init(label: "smtp-example.mail")
+    )
+    let router = try buildRouter(
+        mailClient: mailClient,
         fromEmail: fromEmail,
         defaultToEmail: defaultToEmail,
         logger: logger
     )
-    let router = try buildRouter(sender: sender)
-    var app = Application(
+    var appConfiguration = ApplicationConfiguration(
+        reader: reader.scoped(to: "http")
+    )
+    appConfiguration.address = .hostname("127.0.0.1", port: 8081)
+    let app = Application(
         router: router,
-        configuration: ApplicationConfiguration(
-            reader: reader.scoped(to: "http")
-        ),
+        configuration: appConfiguration,
         eventLoopGroupProvider: .shared(eventLoopGroup),
         logger: logger
     )
-    app.addServices(sender)
     return app
+}
+
+private func formatRFC2822Date(_ date: Date) -> String {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.timeZone = TimeZone(secondsFromGMT: 0)
+    formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
+    return formatter.string(from: date)
 }

@@ -3,6 +3,10 @@ import Foundation
 import Hummingbird
 import Logging
 import ServiceLifecycle
+import FeatherMail
+import FeatherSESMail
+import SotoCore
+import SotoSESv2
 
 /// Shared request context type for the example server.
 public typealias AppRequestContext = BasicRequestContext
@@ -60,15 +64,32 @@ public func buildApplication(
         logger.info("SES sender configured with default AWS credential provider chain")
     }
 
-    let sender = SESMailSender(
-        accessKeyId: accessKeyId,
-        secretAccessKey: secretAccessKey,
-        region: region,
+    let credentialProvider: CredentialProviderFactory = if hasId {
+        .static(
+            accessKeyId: accessKeyId,
+            secretAccessKey: secretAccessKey
+        )
+    } else {
+        .default
+    }
+    let awsClient = AWSClient(credentialProvider: credentialProvider)
+    let ses = SESv2(client: awsClient, region: Region(rawValue: region))
+    let mailClient = SESMailClient(
+        ses: ses,
+        encoder: RawMailEncoder(
+            headerDateEncodingStrategy: {
+                formatRFC2822Date(Date())
+            }
+        ),
+        logger: .init(label: "ses-example.mail")
+    )
+
+    let router = try buildRouter(
+        mailClient: mailClient,
         fromEmail: fromEmail,
         defaultToEmail: defaultToEmail,
         logger: logger
     )
-    let router = try buildRouter(sender: sender)
     var app = Application(
         router: router,
         configuration: ApplicationConfiguration(
@@ -76,6 +97,14 @@ public func buildApplication(
         ),
         logger: logger
     )
-    app.addServices(sender)
+    app.addServices(awsClient)
     return app
+}
+
+private func formatRFC2822Date(_ date: Date) -> String {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.timeZone = TimeZone(secondsFromGMT: 0)
+    formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
+    return formatter.string(from: date)
 }

@@ -1,10 +1,15 @@
 import Hummingbird
+import FeatherMail
+import Logging
 import MailExampleOpenAPI
 import OpenAPIHummingbird
 
 /// Builds the router and registers OpenAPI-generated handlers.
 func buildRouter(
-    sender: any MailSender
+    mailClient: any MailClient,
+    fromEmail: String,
+    defaultToEmail: String,
+    logger: Logger
 ) throws -> Router<AppRequestContext> {
     let router = Router(context: AppRequestContext.self)
 
@@ -28,7 +33,12 @@ func buildRouter(
         )
     }
 
-    let controller = SESExampleAPIController(sender: sender)
+    let controller = SESExampleAPIController(
+        mailClient: mailClient,
+        fromEmail: fromEmail,
+        defaultToEmail: defaultToEmail,
+        logger: logger
+    )
     try controller.registerHandlers(on: router)
 
     return router

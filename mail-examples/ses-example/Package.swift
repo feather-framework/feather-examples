@@ -72,6 +72,8 @@ let package = Package(
             name: "SESExampleTests",
             dependencies: [
                 .target(name: "SESExample"),
+                .product(name: "Hummingbird", package: "hummingbird"),
+                .product(name: "HummingbirdTesting", package: "hummingbird"),
                 .product(name: "MailExampleOpenAPI", package: "mail-example-openapi"),
                 .product(name: "FeatherMemoryMail", package: "feather-memory-mail"),
             ],

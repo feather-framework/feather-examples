@@ -2,83 +2,82 @@
 import Foundation
 import FeatherMail
 import FeatherMemoryMail
-import MailExampleOpenAPI
+import Hummingbird
+import HummingbirdTesting
+import Logging
+import NIOCore
 import Testing
 
-actor MemoryBackedMailSender: MailSender {
-    private let fallbackEmail: String
-    private let client = MemoryMailClient()
-
-    init(fallbackEmail: String = "fallback@example.com") {
-        self.fallbackEmail = fallbackEmail
-    }
-
-    func send(email: String) async throws {
-        let normalized = email.trimmingCharacters(in: .whitespacesAndNewlines)
-        let recipient = (normalized.isEmpty || !isValidEmail(normalized))
-            ? fallbackEmail
-            : normalized
-
-        let mail = Mail(
-            from: .init("sender@example.com"),
-            to: [.init(recipient)],
-            subject: "test",
-            body: .plainText("test")
-        )
-        try await client.send(mail)
-    }
-
-    func sentCount() async -> Int {
-        await client.getMailbox().count
-    }
-
-    func firstRecipient() async -> String? {
-        await client.getMailbox().first?.to.first?.email
-    }
-}
-
 @Suite
-struct SESExampleControllerTests {
+struct SESExampleServerTests {
+
+    private func makeTestApp(
+        mailClient: MemoryMailClient
+    ) throws -> Application<RouterResponder<AppRequestContext>> {
+        let router = try buildRouter(
+            mailClient: mailClient,
+            fromEmail: "sender@example.com",
+            defaultToEmail: "fallback@example.com",
+            logger: Logger(label: "ses-example.tests")
+        )
+        return Application(router: router)
+    }
+
+    private func executeSendMail(
+        _ client: TestClientProtocol,
+        email: String?
+    ) async throws {
+        let payload = if let email {
+            #"{"email":"\#(email)"}"#
+        } else {
+            #"{"email":null}"#
+        }
+        var headers = HTTPFields()
+        headers[.contentType] = "application/json"
+        let body = ByteBufferAllocator().buffer(string: payload)
+        try await client.execute(
+            uri: "/mail/send",
+            method: .post,
+            headers: headers,
+            body: body
+        ) { response in
+            #expect(response.status == .accepted)
+        }
+    }
 
     @Test
-    func acceptsNullEmailAsNoop() async throws {
-        let sender = MemoryBackedMailSender()
-        let controller = SESExampleAPIController(sender: sender)
+    func acceptsNullEmailAsFallback() async throws {
+        let mailClient = MemoryMailClient()
+        let app = try makeTestApp(mailClient: mailClient)
 
-        let output = try await controller.sendMail(
-            .init(body: .json(.init(email: nil)))
-        )
-
-        _ = try output.accepted
-        #expect(await sender.sentCount() == 1)
-        #expect(await sender.firstRecipient() == "fallback@example.com")
+        try await app.test(.live) { client in
+            try await executeSendMail(client, email: nil)
+        }
+        #expect(await mailClient.getMailbox().count == 1)
+        #expect(await mailClient.getMailbox().first?.to.first?.email == "fallback@example.com")
     }
 
     @Test
     func sendsWhenEmailIsValid() async throws {
-        let sender = MemoryBackedMailSender()
-        let controller = SESExampleAPIController(sender: sender)
+        let mailClient = MemoryMailClient()
+        let app = try makeTestApp(mailClient: mailClient)
 
-        let output = try await controller.sendMail(
-            .init(body: .json(.init(email: "user@example.com")))
-        )
-
-        _ = try output.accepted
-        #expect(await sender.sentCount() == 1)
-        #expect(await sender.firstRecipient() == "user@example.com")
+        try await app.test(.live) { client in
+            try await executeSendMail(client, email: "user@example.com")
+        }
+        #expect(await mailClient.getMailbox().count == 1)
+        #expect(await mailClient.getMailbox().first?.to.first?.email == "user@example.com")
     }
 
     @Test
     func fallsBackWhenEmailIsInvalid() async throws {
-        let sender = MemoryBackedMailSender()
-        let controller = SESExampleAPIController(sender: sender)
+        let mailClient = MemoryMailClient()
+        let app = try makeTestApp(mailClient: mailClient)
 
-        let output = try await controller.sendMail(
-            .init(body: .json(.init(email: "invalid-email")))
-        )
-
-        _ = try output.accepted
-        #expect(await sender.sentCount() == 1)
-        #expect(await sender.firstRecipient() == "fallback@example.com")
+        try await app.test(.live) { client in
+            try await executeSendMail(client, email: "invalid-email")
+        }
+        #expect(await mailClient.getMailbox().count == 1)
+        #expect(await mailClient.getMailbox().first?.to.first?.email == "fallback@example.com")
     }
 }
