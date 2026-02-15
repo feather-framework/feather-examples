@@ -9,11 +9,11 @@ Using the following components:
 ## Usage
 
 - OpenAPI package: `spec-example-openapi`
-- Server package: `hummingbird-spec-examples/hummingbird-spec-examples-server`
+- Server package: `hummingbird-spec-examples/hummingbird-spec-examples`
 
 Run tests:
 
 ```sh
-cd hummingbird-spec-examples/hummingbird-spec-examples-server
+cd hummingbird-spec-examples/hummingbird-spec-examples
 swift test
 ```
