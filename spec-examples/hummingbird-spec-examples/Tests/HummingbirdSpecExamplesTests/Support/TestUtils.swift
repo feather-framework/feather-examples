@@ -1,33 +1,38 @@
+import SpecExampleOpenAPI
+import FeatherHummingbirdSpec
 import FeatherSpec
-import FeatherVaporSpec
 import HTTPTypes
 import NIOCore
 import OpenAPIRuntime
 import Testing
-import Vapor
-import SpecExampleOpenAPI
 
-@testable import VaporSpecExamplesServer
+@testable import HummingbirdSpecExamples
 
+/// Generic capture helper for async expectations.
 actor Capture<Value: Sendable> {
     private var value: Value?
 
+    /// Stores a captured value.
     func set(_ newValue: Value) {
         value = newValue
     }
 
+    /// Returns the captured value, if any.
     func get() -> Value? {
         value
     }
 }
 
+/// Capture helper for todo payloads.
 actor TodoCapture {
     private var todo: Components.Schemas.TodoSchema?
 
+    /// Stores a captured todo.
     func set(_ value: Components.Schemas.TodoSchema) {
         todo = value
     }
 
+    /// Returns the captured todo or fails.
     func value() -> Components.Schemas.TodoSchema {
         guard let todo else {
             preconditionFailure("Todo not set")
@@ -36,17 +41,15 @@ actor TodoCapture {
     }
 }
 
-func makeRunner() async throws -> (app: Application, runner: VaporSpecRunner) {
-    let app = try await buildApplication(environment: .testing)
-    return (app: app, runner: VaporSpecRunner(app: app))
+/// Builds a runner backed by the example server application.
+func makeRunner() async throws -> HummingbirdSpecRunner {
+    let app = try await buildApplication()
+    return HummingbirdSpecRunner(app: app)
 }
 
-func shutdownApp(_ app: Application) async {
-    try? await app.asyncShutdown()
-}
-
+/// Runs a spec against the provided runner.
 func runSpec(
-    using runner: VaporSpecRunner,
+    using runner: HummingbirdSpecRunner,
     @SpecBuilder builder: () -> SpecBuilderParameter
 ) async throws {
     try await runner.run {
@@ -54,8 +57,9 @@ func runSpec(
     }
 }
 
+/// Runs a spec and returns the decoded JSON payload.
 func runSpecJSONReturn<T: Decodable & Sendable>(
-    using runner: VaporSpecRunner,
+    using runner: HummingbirdSpecRunner,
     @SpecBuilder builder: () -> SpecBuilderParameter
 ) async throws -> T {
     let capture = Capture<T>()
@@ -75,8 +79,49 @@ func runSpecJSONReturn<T: Decodable & Sendable>(
     return ret
 }
 
+/// Runs a spec and returns the raw binary payload.
+func runSpecBinaryReturn(
+    using runner: HummingbirdSpecRunner,
+    @SpecBuilder builder: () -> SpecBuilderParameter
+) async throws -> ByteBuffer {
+    let capture = Capture<ByteBuffer>()
+
+    try await runSpec(using: runner) {
+        builder()
+        BinaryResponse { data in
+            await capture.set(data)
+        }
+    }
+
+    guard let ret = await capture.get() else {
+        preconditionFailure("Expected binary response payload.")
+    }
+    return ret
+}
+
+/// Runs a spec and returns the raw HTTP response and body.
+func runSpecHTTPReturn(
+    using runner: HummingbirdSpecRunner,
+    @SpecBuilder builder: () -> SpecBuilderParameter
+) async throws -> (response: HTTPResponse, body: HTTPBody) {
+    let capture = Capture<(HTTPResponse, HTTPBody)>()
+
+    try await runSpec(using: runner) {
+        builder()
+        Expect { response, body in
+            await capture.set((response, body))
+        }
+    }
+
+    guard let ret = await capture.get() else {
+        preconditionFailure("Expected HTTP response payload.")
+    }
+    return ret
+}
+
+/// Creates a todo via the API and returns the response payload.
 func createTodo(
-    runner: VaporSpecRunner,
+    runner: HummingbirdSpecRunner,
     name: String = "task01",
     isCompleted: Bool = false,
     listId: String = "list01"
@@ -107,8 +152,9 @@ func createTodo(
     return await capture.value()
 }
 
+/// Creates a list via the API and returns the response payload.
 func createList(
-    runner: VaporSpecRunner,
+    runner: HummingbirdSpecRunner,
     name: String = "list01"
 ) async throws -> Components.Schemas.ListSchema {
     let capture = Capture<Components.Schemas.ListSchema>()

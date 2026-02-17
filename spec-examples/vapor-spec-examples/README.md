@@ -9,11 +9,11 @@ Using the following components:
 ## Usage
 
 - OpenAPI package: `spec-example-openapi`
-- Server package: `vapor-spec-examples/vapor-spec-examples-server`
+- Server package: `vapor-spec-examples/vapor-spec-examples`
 
 Run tests:
 
 ```sh
-cd vapor-spec-examples/vapor-spec-examples-server
+cd vapor-spec-examples/vapor-spec-examples
 swift test
 ```

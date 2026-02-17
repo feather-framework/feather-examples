@@ -11,7 +11,7 @@ var defaultSwiftSettings: [SwiftSetting] =
     // https://forums.swift.org/t/experimental-support-for-lifetime-dependencies-in-swift-6-2-and-beyond/78638
     .enableExperimentalFeature("Lifetimes"),
     // https://github.com/swiftlang/swift/pull/65218
-    .enableExperimentalFeature("AvailabilityMacro=vaporSpecExamplesServer 1.0:macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0"),
+    .enableExperimentalFeature("AvailabilityMacro=sesExample 1.0:macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0"),
 ]
 
 #if compiler(>=6.2)
@@ -27,7 +27,7 @@ defaultSwiftSettings += [
 ]
 
 let package = Package(
-    name: "vapor-spec-examples-server",
+    name: "ses-example",
     platforms: [
         .macOS(.v15),
         .iOS(.v18),
@@ -36,31 +36,41 @@ let package = Package(
         .visionOS(.v2),
     ],
     products: [
-        .executable(name: "VaporSpecExamplesServer", targets: ["VaporSpecExamplesServer"]),
+        .executable(name: "SESExample", targets: ["SESExample"]),
     ],
     dependencies: [
-        .package(path: "../../spec-example-openapi"),
-        .package(url: "https://github.com/vapor/vapor", from: "4.121.2"),
-        .package(url: "https://github.com/feather-framework/feather-vapor-spec", from: "1.0.0-beta.2"),
-        .package(url: "https://github.com/feather-framework/feather-spec", from: "1.0.0-beta.2"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.0.0"),
+        .package(url: "https://github.com/feather-framework/feather-ses-mail", from: "1.0.0-beta.2"),
+        .package(url: "https://github.com/feather-framework/feather-memory-mail", from: "1.0.0-beta.1"),
+        .package(url: "https://github.com/jpsim/Yams.git", from: "6.2.1"),
+        .package(
+            url: "https://github.com/apple/swift-configuration",
+            from: "1.0.0",
+            traits: [
+                .defaults,
+                "CommandLineArguments",
+                "YAML",
+            ]
+        ),
     ],
     targets: [
         .executableTarget(
-            name: "VaporSpecExamplesServer",
+            name: "SESExample",
             dependencies: [
-                .product(name: "Vapor", package: "vapor"),
-                .product(name: "SpecExampleOpenAPI", package: "spec-example-openapi"),
+                .product(name: "Hummingbird", package: "hummingbird"),
+                .product(name: "FeatherSESMail", package: "feather-ses-mail"),
+                .product(name: "Configuration", package: "swift-configuration"),
+                .product(name: "Yams", package: "Yams"),
             ],
             swiftSettings: defaultSwiftSettings
         ),
         .testTarget(
-            name: "VaporSpecExamplesServerTests",
+            name: "SESExampleTests",
             dependencies: [
-                .target(name: "VaporSpecExamplesServer"),
-                .product(name: "SpecExampleOpenAPI", package: "spec-example-openapi"),
-                .product(name: "FeatherSpec", package: "feather-spec"),
-                .product(name: "FeatherVaporSpec", package: "feather-vapor-spec"),
-                .product(name: "Vapor", package: "vapor"),
+                .target(name: "SESExample"),
+                .product(name: "Hummingbird", package: "hummingbird"),
+                .product(name: "HummingbirdTesting", package: "hummingbird"),
+                .product(name: "FeatherMemoryMail", package: "feather-memory-mail"),
             ],
             swiftSettings: defaultSwiftSettings
         )
