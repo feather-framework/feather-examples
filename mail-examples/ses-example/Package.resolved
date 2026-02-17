@@ -1,5 +1,5 @@
 {
-  "originHash" : "0404ad45c04301db4fc3a563dd9ae0a1cb214ff3675aeeebd75801fbd41ad03b",
+  "originHash" : "3a38539949ffb3d837aeed38ea644153004bc55cb294d083f02e0e8378c8ad0f",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -269,24 +269,6 @@
       "state" : {
         "revision" : "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
         "version" : "1.1.1"
-      }
-    },
-    {
-      "identity" : "swift-openapi-hummingbird",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/hummingbird-project/swift-openapi-hummingbird",
-      "state" : {
-        "revision" : "026b50b17e9afe74d4d82c883d9c37154a8b30bf",
-        "version" : "2.0.1"
-      }
-    },
-    {
-      "identity" : "swift-openapi-runtime",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-openapi-runtime",
-      "state" : {
-        "revision" : "7cdf33371bf89b23b9cf4fd3ce8d3c825c28fbe8",
-        "version" : "1.9.0"
       }
     },
     {

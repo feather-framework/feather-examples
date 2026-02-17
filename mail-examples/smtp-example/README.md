@@ -33,13 +33,6 @@ or with Makefile:
 make run-server
 ```
 
-## Browser Testing
-Mail sending is testable from the OpenAPI browser UI when both are running:
-- SMTP Swagger UI (`make run-openapi` in this directory Makefile, then open `http://127.0.0.1:8889`)
-- `smtp-example` server (`make run-server` in this directory Makefile, serves `http://127.0.0.1:8081`)
-
-If you open `openapi/index.html` directly as a file, pass `?spec=http://127.0.0.1:8889/openapi.yaml`.
-
 ## API
 `POST /mail/send`
 

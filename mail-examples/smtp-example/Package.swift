@@ -39,9 +39,7 @@ let package = Package(
         .executable(name: "SMTPExample", targets: ["SMTPExample"]),
     ],
     dependencies: [
-        .package(path: "../mail-example-openapi"),
         .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.0.0"),
-        .package(url: "https://github.com/hummingbird-project/swift-openapi-hummingbird", from: "2.0.1"),
         .package(url: "https://github.com/feather-framework/feather-smtp-mail", exact: "1.0.0-beta.3"),
         .package(url: "https://github.com/feather-framework/feather-memory-mail", from: "1.0.0-beta.1"),
         .package(url: "https://github.com/BinaryBirds/swift-nio-smtp", .upToNextMinor(from: "1.0.0-beta.1")),
@@ -62,8 +60,6 @@ let package = Package(
             name: "SMTPExample",
             dependencies: [
                 .product(name: "Hummingbird", package: "hummingbird"),
-                .product(name: "OpenAPIHummingbird", package: "swift-openapi-hummingbird"),
-                .product(name: "MailExampleOpenAPI", package: "mail-example-openapi"),
                 .product(name: "FeatherSMTPMail", package: "feather-smtp-mail"),
                 .product(name: "NIOSMTP", package: "swift-nio-smtp"),
                 .product(name: "NIO", package: "swift-nio"),
@@ -78,7 +74,6 @@ let package = Package(
                 .target(name: "SMTPExample"),
                 .product(name: "Hummingbird", package: "hummingbird"),
                 .product(name: "HummingbirdTesting", package: "hummingbird"),
-                .product(name: "MailExampleOpenAPI", package: "mail-example-openapi"),
                 .product(name: "FeatherMemoryMail", package: "feather-memory-mail"),
             ],
             swiftSettings: defaultSwiftSettings

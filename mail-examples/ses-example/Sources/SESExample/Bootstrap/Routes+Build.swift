@@ -1,10 +1,7 @@
 import Hummingbird
 import FeatherMail
 import Logging
-import MailExampleOpenAPI
-import OpenAPIHummingbird
 
-/// Builds the router and registers OpenAPI-generated handlers.
 func buildRouter(
     mailClient: any MailClient,
     fromEmail: String,
@@ -39,7 +36,9 @@ func buildRouter(
         defaultToEmail: defaultToEmail,
         logger: logger
     )
-    try controller.registerHandlers(on: router)
+    router.post("/mail/send", use: { request, context in
+        try await controller.sendMail(request: request, context: context)
+    })
 
     return router
 }

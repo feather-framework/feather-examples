@@ -39,9 +39,7 @@ let package = Package(
         .executable(name: "SESExample", targets: ["SESExample"]),
     ],
     dependencies: [
-        .package(path: "../mail-example-openapi"),
         .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.0.0"),
-        .package(url: "https://github.com/hummingbird-project/swift-openapi-hummingbird", from: "2.0.1"),
         .package(url: "https://github.com/feather-framework/feather-ses-mail", from: "1.0.0-beta.2"),
         .package(url: "https://github.com/feather-framework/feather-memory-mail", from: "1.0.0-beta.1"),
         .package(url: "https://github.com/jpsim/Yams.git", from: "6.2.1"),
@@ -60,8 +58,6 @@ let package = Package(
             name: "SESExample",
             dependencies: [
                 .product(name: "Hummingbird", package: "hummingbird"),
-                .product(name: "OpenAPIHummingbird", package: "swift-openapi-hummingbird"),
-                .product(name: "MailExampleOpenAPI", package: "mail-example-openapi"),
                 .product(name: "FeatherSESMail", package: "feather-ses-mail"),
                 .product(name: "Configuration", package: "swift-configuration"),
                 .product(name: "Yams", package: "Yams"),
@@ -74,7 +70,6 @@ let package = Package(
                 .target(name: "SESExample"),
                 .product(name: "Hummingbird", package: "hummingbird"),
                 .product(name: "HummingbirdTesting", package: "hummingbird"),
-                .product(name: "MailExampleOpenAPI", package: "mail-example-openapi"),
                 .product(name: "FeatherMemoryMail", package: "feather-memory-mail"),
             ],
             swiftSettings: defaultSwiftSettings

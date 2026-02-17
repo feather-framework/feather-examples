@@ -27,11 +27,6 @@ or with Makefile:
 make run-server
 ```
 
-## Browser Testing
-Mail sending is testable from the OpenAPI browser UI when both are running:
-- SES Swagger UI (`make run-openapi` in this directory Makefile, then open `http://127.0.0.1:8888`)
-- `ses-example` server (`make run-server` in this directory Makefile, serves `http://127.0.0.1:8080`)
-
 ## API
 `POST /mail/send`
 

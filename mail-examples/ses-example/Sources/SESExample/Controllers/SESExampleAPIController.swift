@@ -1,25 +1,22 @@
 import Foundation
 import FeatherMail
+import Hummingbird
 import Logging
-import MailExampleOpenAPI
 
-/// OpenAPI-backed controller implementation for mail send requests.
-struct SESExampleAPIController: APIProtocol {
+struct SESExampleAPIController {
     let mailClient: any MailClient
     let fromEmail: String
     let defaultToEmail: String
     let logger: Logger
 
-    /// Accepts nullable email payloads and forwards valid values to the mail sender.
     func sendMail(
-        _ input: Operations.sendMail.Input
-    ) async throws -> Operations.sendMail.Output {
-        let payload: Components.Schemas.SendMailRequestSchema
-        switch input.body {
-        case let .json(value):
-            payload = value
-        }
-
+        request: Request,
+        context: AppRequestContext
+    ) async throws -> HTTPResponse.Status {
+        let payload = try await request.decode(
+            as: SendMailRequest.self,
+            context: context
+        )
         let normalized = payload.email?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         let recipient = (normalized.isEmpty || !isValidEmail(normalized))
             ? defaultToEmail
@@ -41,6 +38,10 @@ struct SESExampleAPIController: APIProtocol {
         logger.info("SES send succeeded", metadata: ["recipient": "\(recipient)"])
         return .accepted
     }
+}
+
+private struct SendMailRequest: Codable {
+    let email: String?
 }
 
 private func isValidEmail(_ value: String) -> Bool {
