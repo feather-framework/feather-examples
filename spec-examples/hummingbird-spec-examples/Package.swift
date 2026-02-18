@@ -39,19 +39,15 @@ let package = Package(
         .executable(name: "HummingbirdSpecExamples", targets: ["HummingbirdSpecExamples"]),
     ],
     dependencies: [
-        .package(path: "../spec-example-openapi"),
-        .package(url: "https://github.com/hummingbird-project/hummingbird",from: "2.0.0"),
-        .package(url: "https://github.com/hummingbird-project/swift-openapi-hummingbird", from: "2.0.1"),
-        .package(url: "https://github.com/feather-framework/feather-hummingbird-spec", from: "1.0.0-beta.2"),
-        .package(url: "https://github.com/feather-framework/feather-spec", from: "1.0.0-beta.2"),
+        .package(url: "https://github.com/feather-framework/feather-spec", exact: "1.0.0-beta.2"),
+        .package(url: "https://github.com/feather-framework/feather-hummingbird-spec", exact: "1.0.0-beta.2"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.0.0"),
     ],
     targets: [
         .executableTarget(
             name: "HummingbirdSpecExamples",
             dependencies: [
                 .product(name: "Hummingbird", package: "hummingbird"),
-                .product(name: "OpenAPIHummingbird", package: "swift-openapi-hummingbird"),
-                .product(name: "SpecExampleOpenAPI", package: "spec-example-openapi"),
             ],
             swiftSettings: defaultSwiftSettings
         ),
@@ -59,9 +55,9 @@ let package = Package(
             name: "HummingbirdSpecExamplesTests",
             dependencies: [
                 .target(name: "HummingbirdSpecExamples"),
-                .product(name: "SpecExampleOpenAPI", package: "spec-example-openapi"),
                 .product(name: "FeatherSpec", package: "feather-spec"),
                 .product(name: "FeatherHummingbirdSpec", package: "feather-hummingbird-spec"),
+                .product(name: "HummingbirdTesting", package: "hummingbird"),
             ],
             swiftSettings: defaultSwiftSettings
         )

@@ -1,16 +1,22 @@
-import SpecExampleOpenAPI
 import Hummingbird
-import OpenAPIHummingbird
 
-/// Builds the router and registers OpenAPI-generated handlers.
 func buildRouter(
-    store: InMemoryTodoStore
+    store: InMemoryUserStore
 ) throws -> Router<AppRequestContext> {
     let router = Router(context: AppRequestContext.self)
 
-    // Wire the controller implementation to generated routes.
-    let controller = HummingbirdSpecExamplesAPIController(store: store)
-    try controller.registerHandlers(on: router)
+    let controller = HummingbirdSpecExamplesUserController(store: store)
+    let users = router.group("users")
+    users.get(use: controller.listUsers)
+    users.get("active", use: controller.listActiveUsers)
+    users.get("count", use: controller.userCount)
+    users.post(use: controller.createUser)
+    users.post(":id/activate", use: controller.activateUser)
+    users.post(":id/deactivate", use: controller.deactivateUser)
+    users.get(":id", use: controller.getUser)
+    users.put(":id", use: controller.updateUser)
+    users.patch(":id", use: controller.patchUser)
+    users.delete(":id", use: controller.deleteUser)
 
     return router
 }

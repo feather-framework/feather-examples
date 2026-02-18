@@ -9,10 +9,11 @@ import Foundation
 
 typealias AppRequestContext = BasicRequestContext
 
-func buildApplication(
-    reader: ConfigReader
-) async throws -> some ApplicationProtocol {
-    
+func buildApplicationComponents(
+    reader: ConfigReader,
+    includeServices: Bool = false
+) async throws -> (app: any ApplicationProtocol, client: PostgresClient) {
+
     let logger = {
         var logger = Logger(label: "example-server")
         logger.logLevel = reader.string(
@@ -66,9 +67,20 @@ func buildApplication(
         ),
         logger: logger
     )
-    
-    app.addServices(client)
-    return app
+
+    if includeServices {
+        app.addServices(client)
+    }
+    return (app: app, client: client)
 }
 
-
+func buildApplication(
+    reader: ConfigReader,
+    includeServices: Bool = true
+) async throws -> any ApplicationProtocol {
+    let components = try await buildApplicationComponents(
+        reader: reader,
+        includeServices: includeServices
+    )
+    return components.app
+}

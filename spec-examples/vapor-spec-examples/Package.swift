@@ -39,7 +39,6 @@ let package = Package(
         .executable(name: "VaporSpecExamples", targets: ["VaporSpecExamples"]),
     ],
     dependencies: [
-        .package(path: "../spec-example-openapi"),
         .package(url: "https://github.com/vapor/vapor", from: "4.121.2"),
         .package(url: "https://github.com/feather-framework/feather-vapor-spec", from: "1.0.0-beta.2"),
         .package(url: "https://github.com/feather-framework/feather-spec", from: "1.0.0-beta.2"),
@@ -49,7 +48,6 @@ let package = Package(
             name: "VaporSpecExamples",
             dependencies: [
                 .product(name: "Vapor", package: "vapor"),
-                .product(name: "SpecExampleOpenAPI", package: "spec-example-openapi"),
             ],
             swiftSettings: defaultSwiftSettings
         ),
@@ -57,7 +55,6 @@ let package = Package(
             name: "VaporSpecExamplesTests",
             dependencies: [
                 .target(name: "VaporSpecExamples"),
-                .product(name: "SpecExampleOpenAPI", package: "spec-example-openapi"),
                 .product(name: "FeatherSpec", package: "feather-spec"),
                 .product(name: "FeatherVaporSpec", package: "feather-vapor-spec"),
                 .product(name: "Vapor", package: "vapor"),
