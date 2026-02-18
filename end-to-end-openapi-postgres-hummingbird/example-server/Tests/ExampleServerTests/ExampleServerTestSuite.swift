@@ -3,6 +3,7 @@ import HTTPTypes
 import ExampleOpenAPI
 import OpenAPIRuntime
 import Testing
+import Foundation
 
 /// Spec-driven tests for the Hummingbird examples server API.
 @Suite
@@ -43,7 +44,7 @@ struct ExampleServerTestSuite {
 
         // Full update payload.
         let updatePayload = Components.Schemas.TodoUpdateSchema(
-            name: "task02",
+            name: "task-02-todo",
             isCompleted: true,
             listId: list.id
         )
@@ -53,18 +54,18 @@ struct ExampleServerTestSuite {
             PUT("todos/\(created.id)")
             JSONBody(updatePayload)
             JSONResponse(type: Components.Schemas.TodoSchema.self) { value in
-                #expect(value.name == "task02")
+                #expect(value.name == "task-02-todo")
                 #expect(value.isCompleted == true)
                 #expect(value.listId == list.id)
             }
         }
 
-        #expect(updated.name == "task02")
+        #expect(updated.name == "task-02-todo")
         #expect(updated.isCompleted == true)
         #expect(updated.listId == list.id)
 
         // Partial update payload.
-        let patchPayload = Components.Schemas.TodoPatchSchema(name: "task03")
+        let patchPayload = Components.Schemas.TodoPatchSchema(name: "task-03-todo")
 
         // Apply PATCH update and validate.
         let patched: Components.Schemas.TodoSchema = try await runSpecJSONReturn(using: runner) {
@@ -73,7 +74,7 @@ struct ExampleServerTestSuite {
             Expect(.ok)
         }
 
-        #expect(patched.name == "task03")
+        #expect(patched.name == "task-03-todo")
         #expect(patched.listId == list.id)
     }
 
@@ -112,64 +113,11 @@ struct ExampleServerTestSuite {
         }
     }
 
-    /// Covers invalid todo payloads for create/update/patch.
-    @Test
-    func testTodoValidation() async throws {
-        let runner = try await makeRunner()
-
-        // Create with empty name.
-        try await runSpec(using: runner) {
-            POST("todos")
-            JSONBody(Components.Schemas.TodoCreateSchema(
-                name: "",
-                isCompleted: false,
-                listId: "list01"
-            ))
-            Expect(.unprocessableContent)
-        }
-
-        // Create with empty list id currently surfaces as a server error.
-        try await runSpec(using: runner) {
-            POST("todos")
-            JSONBody(Components.Schemas.TodoCreateSchema(
-                name: "task01",
-                isCompleted: false,
-                listId: ""
-            ))
-            Expect(.internalServerError)
-        }
-
-        let list = try await createList(runner: runner)
-        let created = try await createTodo(runner: runner, listId: list.id)
-
-        // Update with empty name.
-        try await runSpec(using: runner) {
-            PUT("todos/\(created.id)")
-            JSONBody(Components.Schemas.TodoUpdateSchema(
-                name: "",
-                isCompleted: false,
-                listId: list.id
-            ))
-            Expect(.unprocessableContent)
-        }
-
-        // Patch to invalid empty name.
-        try await runSpec(using: runner) {
-            PATCH("todos/\(created.id)")
-            JSONBody(Components.Schemas.TodoPatchSchema(
-                name: "",
-                isCompleted: nil,
-                listId: nil
-            ))
-            Expect(.unprocessableContent)
-        }
-    }
-
     /// Covers list and get behaviors for lists.
     @Test
     func testCreateGetAndListLists() async throws {
         let runner = try await makeRunner()
-        let created = try await createList(runner: runner, name: "list-alpha")
+        let created = try await createList(runner: runner)
 
         // Fetch the created list by id.
         let fetched: Components.Schemas.ListSchema = try await runSpecJSONReturn(using: runner) {
@@ -194,10 +142,11 @@ struct ExampleServerTestSuite {
     @Test
     func testUpdateAndPatchList() async throws {
         let runner = try await makeRunner()
-        let created = try await createList(runner: runner, name: "list-alpha")
+        let created = try await createList(runner: runner)
 
         // Full update payload.
-        let updatePayload = Components.Schemas.ListUpdateSchema(name: "list-beta")
+        let token = created.id.prefix(6).lowercased()
+        let updatePayload = Components.Schemas.ListUpdateSchema(name: "list-\(token)-beta-name")
         let updated: Components.Schemas.ListSchema = try await runSpecJSONReturn(using: runner) {
             PUT("lists/\(created.id)")
             JSONBody(updatePayload)
@@ -205,10 +154,10 @@ struct ExampleServerTestSuite {
         }
 
         // Verify update response.
-        #expect(updated.name == "list-beta")
+        #expect(updated.name == "list-\(token)-beta-name")
 
         // Partial update payload.
-        let patchPayload = Components.Schemas.ListPatchSchema(name: "list-gamma")
+        let patchPayload = Components.Schemas.ListPatchSchema(name: "list-\(token)-gamma-name")
         let patched: Components.Schemas.ListSchema = try await runSpecJSONReturn(using: runner) {
             PATCH("lists/\(created.id)")
             JSONBody(patchPayload)
@@ -216,14 +165,14 @@ struct ExampleServerTestSuite {
         }
 
         // Verify patch response.
-        #expect(patched.name == "list-gamma")
+        #expect(patched.name == "list-\(token)-gamma-name")
     }
 
     /// Covers delete and post-delete fetch for lists.
     @Test
     func testDeleteList() async throws {
         let runner = try await makeRunner()
-        let created = try await createList(runner: runner, name: "list-alpha")
+        let created = try await createList(runner: runner)
 
         // Delete the record.
         try await runSpec(using: runner) {
@@ -238,9 +187,9 @@ struct ExampleServerTestSuite {
         }
     }
 
-    /// Covers missing list responses and invalid payloads.
+    /// Covers missing list responses.
     @Test
-    func testListNotFoundAndValidation() async throws {
+    func testListNotFound() async throws {
         let runner = try await makeRunner()
 
         // Missing list by id.
@@ -253,20 +202,6 @@ struct ExampleServerTestSuite {
         try await runSpec(using: runner) {
             DELETE("lists/missing")
             Expect(.noContent)
-        }
-
-        // Create with empty name.
-        try await runSpec(using: runner) {
-            POST("lists")
-            JSONBody(Components.Schemas.ListCreateSchema(name: ""))
-            Expect(.unprocessableContent)
-        }
-
-        // Update with empty name.
-        try await runSpec(using: runner) {
-            PUT("lists/missing")
-            JSONBody(Components.Schemas.ListUpdateSchema(name: ""))
-            Expect(.unprocessableContent)
         }
     }
 }

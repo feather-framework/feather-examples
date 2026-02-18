@@ -8,6 +8,7 @@ import NIOCore
 import OpenAPIRuntime
 import PostgresNIO
 import Testing
+import Foundation
 
 @testable import ExampleServer
 
@@ -176,13 +177,14 @@ func runSpecHTTPReturn(
 /// Creates a todo via the API and returns the response payload.
 func createTodo(
     runner: HummingbirdSpecRunner,
-    name: String = "task01",
+    name: String? = nil,
     isCompleted: Bool = false,
     listId: String = "list01"
 ) async throws -> Components.Schemas.TodoSchema {
     let capture = TodoCapture()
+    let finalName = name ?? "task-\(UUID().uuidString.prefix(8).lowercased())-todo"
     let payload = Components.Schemas.TodoCreateSchema(
-        name: name,
+        name: finalName,
         isCompleted: isCompleted,
         listId: listId
     )
@@ -209,10 +211,11 @@ func createTodo(
 /// Creates a list via the API and returns the response payload.
 func createList(
     runner: HummingbirdSpecRunner,
-    name: String = "list01"
+    name: String? = nil
 ) async throws -> Components.Schemas.ListSchema {
     let capture = Capture<Components.Schemas.ListSchema>()
-    let payload = Components.Schemas.ListCreateSchema(name: name)
+    let finalName = name ?? "list-\(UUID().uuidString.prefix(8).lowercased())-name"
+    let payload = Components.Schemas.ListCreateSchema(name: finalName)
 
     try await runSpec(using: runner) {
         POST("lists")

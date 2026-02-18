@@ -60,6 +60,10 @@ let package = Package(
             exact: "1.0.0-beta.4"
         ),
         .package(
+            url: "https://github.com/feather-framework/feather-validation",
+            branch: "main"
+        ),
+        .package(
             url: "https://github.com/BinaryBirds/swift-nanoid",
             from: "1.0.0"
         ),
@@ -82,6 +86,8 @@ let package = Package(
                 .product(name: "OpenAPIHummingbird", package: "swift-openapi-hummingbird"),
                 .product(name: "NanoID", package: "swift-nanoid"),
                 .product(name: "FeatherPostgresDatabase", package: "feather-postgres-database"),
+                .product(name: "FeatherValidation", package: "feather-validation"),
+                .product(name: "FeatherValidationFoundation", package: "feather-validation"),
                 .product(name: "ExampleOpenAPI", package: "example-openapi"),
             ],
             swiftSettings: defaultSwiftSettings

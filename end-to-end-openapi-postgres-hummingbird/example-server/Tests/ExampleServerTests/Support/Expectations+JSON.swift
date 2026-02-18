@@ -46,21 +46,6 @@ extension ByteBuffer {
 
 // MARK: - request method helpers
 
-public struct BearerToken: SpecBuilderParameter {
-    let token: String
-
-    public init(
-        _ token: String
-    ) {
-        self.token = token
-    }
-
-    /// Sets the authorization header using the bearer token.
-    public func build(_ spec: inout Spec) {
-        spec.setHeader(.authorization, "Bearer \(token)")
-    }
-}
-
 /// Builder parameter for GET requests.
 public struct GET: SpecBuilderParameter {
     let path: String?

@@ -42,7 +42,7 @@ struct ExampleAPIController: APIProtocol {
         let listId = input.path.listId
 
         return try await database.withConnection { connection in
-            try await connection.run(
+            return try await connection.run(
                 query: #"""
                     DELETE FROM lists WHERE id=\#(listId);
                     """#
@@ -56,18 +56,23 @@ struct ExampleAPIController: APIProtocol {
         _ input: Operations.UpdateList.Input
     ) async throws -> Operations.UpdateList.Output {
         let listId = input.path.listId
-        let payload: Components.Schemas.ListUpdateSchema
+        let rawPayload: Components.Schemas.ListUpdateSchema
         switch input.body {
         case let .json(value):
-            payload = value
+            rawPayload = value
         }
-        
-        guard !payload.name.isEmpty else {
+        let payload = rawPayload.normalized()
+
+        let failures = await payload.failures()
+        guard failures.isEmpty else {
             return .unprocessableContent(.init())
         }
 
         return try await database.withConnection { connection in
-            try await connection.run(
+            if try await listNameExists(payload.name, excludingListId: listId, on: connection) {
+                return .unprocessableContent(.init())
+            }
+            return try await connection.run(
                 query: #"""
                     UPDATE 
                         lists 
@@ -80,7 +85,7 @@ struct ExampleAPIController: APIProtocol {
                     """#
             ) { sequence in
                 guard let row = try await sequence.collect().first else {
-                    return .notFound(.init())
+                    return Operations.UpdateList.Output.notFound(.init())
                 }
                 let list = try Components.Schemas.ListSchema.decode(from: row)
 
@@ -97,10 +102,16 @@ struct ExampleAPIController: APIProtocol {
         _ input: Operations.PatchList.Input
     ) async throws -> Operations.PatchList.Output {
         let listId = input.path.listId
-        let payload: Components.Schemas.ListPatchSchema
+        let rawPayload: Components.Schemas.ListPatchSchema
         switch input.body {
         case let .json(value):
-            payload = value
+            rawPayload = value
+        }
+        let payload = rawPayload.normalized()
+
+        let failures = await payload.failures()
+        guard failures.isEmpty else {
+            return .unprocessableContent(.init())
         }
 
         return try await database.withConnection { connection in
@@ -113,13 +124,13 @@ struct ExampleAPIController: APIProtocol {
             }
 
             guard let existing else {
-                return .notFound(.init())
+                return Operations.PatchList.Output.notFound(.init())
             }
 
             let current = try Components.Schemas.ListSchema.decode(from: existing)
             let name = payload.name ?? current.name
 
-            guard !name.isEmpty else {
+            if try await listNameExists(name, excludingListId: listId, on: connection) {
                 return .unprocessableContent(.init())
             }
 
@@ -136,7 +147,7 @@ struct ExampleAPIController: APIProtocol {
                     """#
             ) { sequence in
                 guard let row = try await sequence.collect().first else {
-                    return .notFound(.init())
+                    return Operations.PatchList.Output.notFound(.init())
                 }
                 let list = try Components.Schemas.ListSchema.decode(from: row)
 
@@ -155,13 +166,13 @@ struct ExampleAPIController: APIProtocol {
         let listId = input.path.listId
 
         return try await database.withConnection { connection in
-            try await connection.run(
+            return try await connection.run(
                 query: #"""
                     SELECT * FROM lists WHERE id=\#(listId) LIMIT 1;
                     """#
             ) { sequence in
                 guard let row = try await sequence.collect().first else {
-                    return .notFound(.init())
+                    return Operations.GetList.Output.notFound(.init())
                 }
                 let list = try Components.Schemas.ListSchema.decode(from: row)
 
@@ -177,20 +188,24 @@ struct ExampleAPIController: APIProtocol {
     func createList(
         _ input: Operations.CreateList.Input
     ) async throws -> Operations.CreateList.Output {
-        let payload: Components.Schemas.ListCreateSchema
+        let rawPayload: Components.Schemas.ListCreateSchema
         switch input.body {
         case let .json(value):
-            payload = value
+            rawPayload = value
         }
+        let payload = rawPayload.normalized()
 
         let listId = NanoID().rawValue
-
-        guard !payload.name.isEmpty else {
+        let failures = await payload.failures()
+        guard failures.isEmpty else {
             return .unprocessableContent(.init())
         }
 
         return try await database.withConnection { connection in
-            try await connection.run(
+            if try await listNameExists(payload.name, excludingListId: nil, on: connection) {
+                return .unprocessableContent(.init())
+            }
+            return try await connection.run(
                 query: #"""
                     INSERT INTO 
                         lists (id, name)
@@ -201,7 +216,7 @@ struct ExampleAPIController: APIProtocol {
                     """#
             ) { sequence in
                 guard let row = try await sequence.collect().first else {
-                    return .notFound(.init())
+                    return Operations.CreateList.Output.notFound(.init())
                 }
                 let list = try Components.Schemas.ListSchema.decode(from: row)
 
@@ -219,7 +234,7 @@ struct ExampleAPIController: APIProtocol {
         _ input: Operations.ListLists.Input
     ) async throws -> Operations.ListLists.Output {
         try await database.withConnection { connection in
-            try await connection.run(
+            return try await connection.run(
                 query: #"""
                     SELECT * FROM lists ORDER BY id;
                     """#
@@ -245,7 +260,7 @@ struct ExampleAPIController: APIProtocol {
         _ input: Operations.ListTodos.Input
     ) async throws -> Operations.ListTodos.Output {
         try await database.withConnection { connection in
-            try await connection.run(
+            return try await connection.run(
                 query: #"""
                     SELECT * FROM todos ORDER BY id;
                     """#
@@ -268,20 +283,33 @@ struct ExampleAPIController: APIProtocol {
     func createTodo(
         _ input: Operations.CreateTodo.Input
     ) async throws -> Operations.CreateTodo.Output {
-        let payload: Components.Schemas.TodoCreateSchema
+        let rawPayload: Components.Schemas.TodoCreateSchema
         switch input.body {
         case let .json(value):
-            payload = value
+            rawPayload = value
         }
+        let payload = rawPayload.normalized()
 
         let todoId = NanoID().rawValue
-        
-        guard !payload.name.isEmpty else {
+
+        let failures = await payload.failures()
+        guard failures.isEmpty else {
             return .unprocessableContent(.init())
         }
 
         return try await database.withConnection { connection in
-            try await connection.run(
+            guard try await listExists(payload.listId, on: connection) else {
+                return .unprocessableContent(.init())
+            }
+            if try await todoNameExists(
+                payload.name,
+                inListId: payload.listId,
+                excludingTodoId: nil,
+                on: connection
+            ) {
+                return .unprocessableContent(.init())
+            }
+            return try await connection.run(
                 query: #"""
                     INSERT INTO 
                         todos (id, name, is_completed, list_id)
@@ -292,7 +320,7 @@ struct ExampleAPIController: APIProtocol {
                     """#
             ) { sequence in
                 guard let row = try await sequence.collect().first else {
-                    return .notFound(.init())
+                    return Operations.CreateTodo.Output.notFound(.init())
                 }
                 let todo = try Components.Schemas.TodoSchema.decode(from: row)
 
@@ -317,7 +345,7 @@ struct ExampleAPIController: APIProtocol {
                     """#
             ) { sequence in
                 guard let row = try await sequence.collect().first else {
-                    return .notFound(.init())
+                    return Operations.GetTodo.Output.notFound(.init())
                 }
                 let todo = try Components.Schemas.TodoSchema.decode(from: row)
 
@@ -334,18 +362,31 @@ struct ExampleAPIController: APIProtocol {
         _ input: Operations.UpdateTodo.Input
     ) async throws -> Operations.UpdateTodo.Output {
         let todoId = input.path.todoId
-        let payload: Components.Schemas.TodoUpdateSchema
+        let rawPayload: Components.Schemas.TodoUpdateSchema
         switch input.body {
         case let .json(value):
-            payload = value
+            rawPayload = value
         }
-        
-        guard !payload.name.isEmpty else {
+        let payload = rawPayload.normalized()
+
+        let failures = await payload.failures()
+        guard failures.isEmpty else {
             return .unprocessableContent(.init())
         }
 
         return try await database.withConnection { connection in
-            try await connection.run(
+            guard try await listExists(payload.listId, on: connection) else {
+                return .unprocessableContent(.init())
+            }
+            if try await todoNameExists(
+                payload.name,
+                inListId: payload.listId,
+                excludingTodoId: todoId,
+                on: connection
+            ) {
+                return .unprocessableContent(.init())
+            }
+            return try await connection.run(
                 query: #"""
                     UPDATE 
                         todos 
@@ -360,7 +401,7 @@ struct ExampleAPIController: APIProtocol {
                     """#
             ) { sequence in
                 guard let row = try await sequence.collect().first else {
-                    return .notFound(.init())
+                    return Operations.UpdateTodo.Output.notFound(.init())
                 }
                 let todo = try Components.Schemas.TodoSchema.decode(from: row)
 
@@ -377,10 +418,16 @@ struct ExampleAPIController: APIProtocol {
         _ input: Operations.PatchTodo.Input
     ) async throws -> Operations.PatchTodo.Output {
         let todoId = input.path.todoId
-        let payload: Components.Schemas.TodoPatchSchema
+        let rawPayload: Components.Schemas.TodoPatchSchema
         switch input.body {
         case let .json(value):
-            payload = value
+            rawPayload = value
+        }
+        let payload = rawPayload.normalized()
+
+        let failures = await payload.failures()
+        guard failures.isEmpty else {
+            return .unprocessableContent(.init())
         }
 
         return try await database.withConnection { connection in
@@ -393,7 +440,7 @@ struct ExampleAPIController: APIProtocol {
             }
 
             guard let existing else {
-                return .notFound(.init())
+                return Operations.PatchTodo.Output.notFound(.init())
             }
 
             let current = try Components.Schemas.TodoSchema.decode(from: existing)
@@ -401,7 +448,15 @@ struct ExampleAPIController: APIProtocol {
             let isCompleted = payload.isCompleted ?? current.isCompleted
             let listId = payload.listId ?? current.listId
 
-            guard !name.isEmpty else {
+            guard try await listExists(listId, on: connection) else {
+                return .unprocessableContent(.init())
+            }
+            if try await todoNameExists(
+                name,
+                inListId: listId,
+                excludingTodoId: todoId,
+                on: connection
+            ) {
                 return .unprocessableContent(.init())
             }
 
@@ -420,7 +475,7 @@ struct ExampleAPIController: APIProtocol {
                     """#
             ) { sequence in
                 guard let row = try await sequence.collect().first else {
-                    return .notFound(.init())
+                    return Operations.PatchTodo.Output.notFound(.init())
                 }
                 let todo = try Components.Schemas.TodoSchema.decode(from: row)
 
@@ -446,6 +501,88 @@ struct ExampleAPIController: APIProtocol {
             ) { _ in
                 return .noContent
             }
+        }
+    }
+}
+
+private extension ExampleAPIController {
+
+    // Checks whether a list id exists.
+    func listExists(
+        _ listId: String,
+        on connection: any DatabaseConnection
+    ) async throws -> Bool {
+        try await connection.run(
+            query: #"""
+                SELECT 1 FROM lists WHERE id=\#(listId) LIMIT 1;
+                """#
+        ) { sequence in
+            try await sequence.collect().isEmpty == false
+        }
+    }
+
+    // Checks whether a list name is already used, optionally excluding one list id.
+    func listNameExists(
+        _ name: String,
+        excludingListId: String?,
+        on connection: any DatabaseConnection
+    ) async throws -> Bool {
+        if let excludingListId {
+            return try await connection.run(
+                query: #"""
+                    SELECT 1
+                    FROM lists
+                    WHERE lower(name)=lower(\#(name))
+                      AND id<>\#(excludingListId)
+                    LIMIT 1;
+                    """#
+            ) { sequence in
+                try await sequence.collect().isEmpty == false
+            }
+        }
+        return try await connection.run(
+            query: #"""
+                SELECT 1
+                FROM lists
+                WHERE lower(name)=lower(\#(name))
+                LIMIT 1;
+                """#
+        ) { sequence in
+            try await sequence.collect().isEmpty == false
+        }
+    }
+
+    // Checks whether a todo name is already used in a list, optionally excluding one todo id.
+    func todoNameExists(
+        _ name: String,
+        inListId listId: String,
+        excludingTodoId: String?,
+        on connection: any DatabaseConnection
+    ) async throws -> Bool {
+        if let excludingTodoId {
+            return try await connection.run(
+                query: #"""
+                    SELECT 1
+                    FROM todos
+                    WHERE lower(name)=lower(\#(name))
+                      AND list_id=\#(listId)
+                      AND id<>\#(excludingTodoId)
+                    LIMIT 1;
+                    """#
+            ) { sequence in
+                try await sequence.collect().isEmpty == false
+            }
+        }
+        return try await connection.run(
+            query: #"""
+                SELECT 1
+                FROM todos
+                WHERE lower(name)=lower(\#(name))
+                  AND list_id=\#(listId)
+                LIMIT 1;
+                """#
+        ) { sequence in
+            try await sequence.collect().isEmpty == false
         }
     }
 }

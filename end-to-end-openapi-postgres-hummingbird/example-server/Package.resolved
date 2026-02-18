@@ -1,5 +1,5 @@
 {
-  "originHash" : "af0a27a6872a66e1dd8d9ad1a27b788097c266cf01b960fe8ae6897767998a9a",
+  "originHash" : "4a56b66b8cf9ba526fa60d824d85b70a4b311cb4969759792cd8bc23426c4ce9",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -44,6 +44,15 @@
       "state" : {
         "revision" : "775707a06866af92d81853643a61fcf675c255cb",
         "version" : "1.0.0-beta.2"
+      }
+    },
+    {
+      "identity" : "feather-validation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/feather-framework/feather-validation",
+      "state" : {
+        "branch" : "main",
+        "revision" : "f9b5897090e69d105f1c54399b1fb960e908ee9a"
       }
     },
     {

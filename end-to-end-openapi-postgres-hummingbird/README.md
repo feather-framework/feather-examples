@@ -19,7 +19,21 @@ The full Hummingbird spec test suite is in:
 
 - `example-server/Tests/ExampleServerTests`
 
-Run tests:
+- `ExampleServerTestSuite` checks the normal API flow.
+- It covers create, get, list, update, patch, delete, and not-found cases.
+
+## Validation tests
+
+Validation rules and request validation extensions are defined in:
+
+- `example-server/Sources/ExampleServer/Validation/ExampleAPIValidation+Rules.swift`
+- `example-server/Sources/ExampleServer/Validation/ExampleAPIValidation+Failures.swift`
+
+Validation test coverage is in:
+
+- `example-server/Tests/ExampleServerTests/ExampleServerValidationTestSuite.swift`
+
+## Run tests
 
 ```sh
 cd example-server
