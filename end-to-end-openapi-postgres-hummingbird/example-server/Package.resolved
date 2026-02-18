@@ -1,5 +1,5 @@
 {
-  "originHash" : "7997d749950a28104af28eaa696653194451507d4bbaf693f115d9a5357b1147",
+  "originHash" : "af0a27a6872a66e1dd8d9ad1a27b788097c266cf01b960fe8ae6897767998a9a",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -20,6 +20,15 @@
       }
     },
     {
+      "identity" : "feather-hummingbird-spec",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/feather-framework/feather-hummingbird-spec",
+      "state" : {
+        "revision" : "dc1ab008d12fddcb5e5c6e793d792c43bad6e4cf",
+        "version" : "1.0.0-beta.2"
+      }
+    },
+    {
       "identity" : "feather-postgres-database",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/feather-framework/feather-postgres-database",
@@ -29,12 +38,21 @@
       }
     },
     {
+      "identity" : "feather-spec",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/feather-framework/feather-spec",
+      "state" : {
+        "revision" : "775707a06866af92d81853643a61fcf675c255cb",
+        "version" : "1.0.0-beta.2"
+      }
+    },
+    {
       "identity" : "hummingbird",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hummingbird-project/hummingbird",
       "state" : {
-        "revision" : "960fd08e28e1858e0896410e3a800ff80e112a80",
-        "version" : "2.20.0"
+        "revision" : "328a211b3bdc8bdd41a40a3d4112ed6b79358fa4",
+        "version" : "2.20.1"
       }
     },
     {

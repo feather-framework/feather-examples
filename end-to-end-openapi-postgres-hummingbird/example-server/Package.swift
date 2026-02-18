@@ -63,6 +63,14 @@ let package = Package(
             url: "https://github.com/BinaryBirds/swift-nanoid",
             from: "1.0.0"
         ),
+        .package(
+            url: "https://github.com/feather-framework/feather-hummingbird-spec",
+            from: "1.0.0-beta.2"
+        ),
+        .package(
+            url: "https://github.com/feather-framework/feather-spec",
+            from: "1.0.0-beta.2"
+        ),
         .package(path: "../example-openapi"),
     ],
     targets: [
@@ -89,6 +97,11 @@ let package = Package(
         .testTarget(
             name: "ExampleServerTests",
             dependencies: [
+                .target(name: "ExampleServer"),
+                .product(name: "Configuration", package: "swift-configuration"),
+                .product(name: "ExampleOpenAPI", package: "example-openapi"),
+                .product(name: "FeatherSpec", package: "feather-spec"),
+                .product(name: "FeatherHummingbirdSpec", package: "feather-hummingbird-spec"),
                 .product(name: "HummingbirdTesting", package: "hummingbird")
             ],
             swiftSettings: defaultSwiftSettings

@@ -1,8 +1,8 @@
 import FeatherSpec
+import Foundation
 import HTTPTypes
 import NIOCore
 import OpenAPIRuntime
-import XCTest
 import NIOFoundationCompat
 
 /// Wrapper to mark JSONDecoder as sendable for expectation closures.
@@ -254,7 +254,9 @@ public struct JSONResponse<T: Decodable & Sendable>: SpecBuilderParameter {
     public func build(_ spec: inout Spec) {
         spec.addExpectation(status)
         spec.addExpectation(.contentType) { value in
-            XCTAssertTrue(value.contains("application/json"))
+            guard value.contains("application/json") else {
+                throw Spec.Failure.header(.contentType)
+            }
         }
         spec.addExpectation(expectation.block)
     }

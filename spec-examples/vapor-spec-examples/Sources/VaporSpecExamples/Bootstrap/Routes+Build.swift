@@ -2,43 +2,36 @@ import Vapor
 
 func buildRoutes(
     app: Application,
-    controller: VaporSpecExamplesAPIController
+    controller: VaporSpecExamplesUserController
 ) throws {
-    app.get("todos") { req async throws -> Response in
-        try await controller.listTodos(req)
+    app.get("users") { req async throws -> Response in
+        try await controller.listUsers(req)
     }
-    app.post("todos") { req async throws -> Response in
-        try await controller.createTodo(req)
+    app.get("users", "active") { req async throws -> Response in
+        try await controller.listActiveUsers(req)
     }
-    app.get("todos", ":todoId") { req async throws -> Response in
-        try await controller.getTodo(req)
+    app.get("users", "count") { req async throws -> Response in
+        try await controller.userCount(req)
     }
-    app.put("todos", ":todoId") { req async throws -> Response in
-        try await controller.updateTodo(req)
+    app.post("users") { req async throws -> Response in
+        try await controller.createUser(req)
     }
-    app.patch("todos", ":todoId") { req async throws -> Response in
-        try await controller.patchTodo(req)
+    app.get("users", ":id") { req async throws -> Response in
+        try await controller.getUser(req)
     }
-    app.delete("todos", ":todoId") { req async throws -> Response in
-        try await controller.deleteTodo(req)
+    app.put("users", ":id") { req async throws -> Response in
+        try await controller.updateUser(req)
     }
-
-    app.get("lists") { req async throws -> Response in
-        try await controller.listLists(req)
+    app.patch("users", ":id") { req async throws -> Response in
+        try await controller.patchUser(req)
     }
-    app.post("lists") { req async throws -> Response in
-        try await controller.createList(req)
+    app.delete("users", ":id") { req async throws -> Response in
+        try await controller.deleteUser(req)
     }
-    app.get("lists", ":listId") { req async throws -> Response in
-        try await controller.getList(req)
+    app.post("users", ":id", "activate") { req async throws -> Response in
+        try await controller.activateUser(req)
     }
-    app.put("lists", ":listId") { req async throws -> Response in
-        try await controller.updateList(req)
-    }
-    app.patch("lists", ":listId") { req async throws -> Response in
-        try await controller.patchList(req)
-    }
-    app.delete("lists", ":listId") { req async throws -> Response in
-        try await controller.deleteList(req)
+    app.post("users", ":id", "deactivate") { req async throws -> Response in
+        try await controller.deactivateUser(req)
     }
 }

@@ -1,19 +1,47 @@
 # Hummingbird spec examples
 
-Using the following components:
+This package contains a simple Hummingbird user CRUD example.
 
-- Feather OpenAPI (generated Swift + OpenAPI YAML)
-- Hummingbird
-- Feather Hummingbird Spec
+Routes:
+
+- `GET /users`
+- `GET /users/active`
+- `GET /users/count`
+- `POST /users`
+- `GET /users/:id`
+- `PUT /users/:id`
+- `PATCH /users/:id`
+- `DELETE /users/:id`
+- `POST /users/:id/activate`
+- `POST /users/:id/deactivate`
+
+Examples:
+
+```sh
+# Create
+curl -i -X POST http://127.0.0.1:8080/users \
+  -H 'content-type: application/json' \
+  -d '{"name":"Alex","email":"alex@example.com","isActive":true}'
+
+# List
+curl -i http://127.0.0.1:8080/users
+
+# Active users
+curl -i http://127.0.0.1:8080/users/active
+
+# Count
+curl -i http://127.0.0.1:8080/users/count
+
+# Activate / Deactivate
+curl -i -X POST http://127.0.0.1:8080/users/<id>/activate
+curl -i -X POST http://127.0.0.1:8080/users/<id>/deactivate
+```
 
 ## Usage
-
-- OpenAPI package: `spec-example-openapi`
-- Server package: `hummingbird-spec-examples/hummingbird-spec-examples`
 
 Run tests:
 
 ```sh
-cd hummingbird-spec-examples/hummingbird-spec-examples
+cd spec-examples/hummingbird-spec-examples
 swift test
 ```

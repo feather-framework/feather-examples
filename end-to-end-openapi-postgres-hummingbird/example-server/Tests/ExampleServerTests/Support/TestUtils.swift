@@ -1,12 +1,39 @@
-import SpecExampleOpenAPI
+import Configuration
+import ExampleOpenAPI
 import FeatherHummingbirdSpec
 import FeatherSpec
 import HTTPTypes
+import HummingbirdTesting
 import NIOCore
 import OpenAPIRuntime
+import PostgresNIO
 import Testing
 
-@testable import HummingbirdSpecExamples
+@testable import ExampleServer
+
+private func migrateDatabase(using client: PostgresClient) async throws {
+    try await client.withConnection { connection in
+        _ = try await connection.query(
+            #"""
+            CREATE TABLE IF NOT EXISTS lists (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL
+            );
+            """#
+        ).get()
+
+        _ = try await connection.query(
+            #"""
+            CREATE TABLE IF NOT EXISTS todos (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                is_completed BOOLEAN,
+                list_id TEXT NOT NULL REFERENCES lists(id)
+            );
+            """#
+        ).get()
+    }
+}
 
 /// Generic capture helper for async expectations.
 actor Capture<Value: Sendable> {
@@ -43,8 +70,16 @@ actor TodoCapture {
 
 /// Builds a runner backed by the example server application.
 func makeRunner() async throws -> HummingbirdSpecRunner {
-    let app = try await buildApplication()
-    return HummingbirdSpecRunner(app: app)
+    let reader = ConfigReader(
+        providers: [
+            InMemoryProvider(values: [:])
+        ]
+    )
+    let components = try await buildApplicationComponents(reader: reader)
+    return HummingbirdSpecRunner(
+        app: components.app,
+        testingSetup: .router
+    )
 }
 
 /// Runs a spec against the provided runner.
@@ -52,8 +87,27 @@ func runSpec(
     using runner: HummingbirdSpecRunner,
     @SpecBuilder builder: () -> SpecBuilderParameter
 ) async throws {
-    try await runner.run {
-        builder()
+    _ = runner
+    let reader = ConfigReader(
+        providers: [
+            InMemoryProvider(values: [:])
+        ]
+    )
+    let components = try await buildApplicationComponents(reader: reader)
+    let freshRunner = HummingbirdSpecRunner(
+        app: components.app,
+        testingSetup: .router
+    )
+
+    try await withThrowingTaskGroup(of: Void.self) { group in
+        group.addTask {
+            await components.client.run()
+        }
+        try await migrateDatabase(using: components.client)
+        try await freshRunner.run {
+            builder()
+        }
+        group.cancelAll()
     }
 }
 
@@ -134,7 +188,7 @@ func createTodo(
     )
     let body = HTTPBody.json(payload)
 
-    try await runner.run {
+    try await runSpec(using: runner) {
         Method(.post)
         Path("todos")
         Header(.contentType, "application/json")
