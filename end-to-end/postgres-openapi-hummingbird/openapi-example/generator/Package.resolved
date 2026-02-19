@@ -1,0 +1,33 @@
+{
+  "originHash" : "bf5cc0e8f2c89170ef5ff19422564f2530c259d4857ccee35f74f5d493c01716",
+  "pins" : [
+    {
+      "identity" : "feather-openapi",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/feather-framework/feather-openapi",
+      "state" : {
+        "revision" : "969e22356be82b53a700551c3a8fb29d9f6a0911",
+        "version" : "1.0.0-beta.5"
+      }
+    },
+    {
+      "identity" : "openapikit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mattpolzin/OpenAPIKit",
+      "state" : {
+        "revision" : "f23fdf4223fcd780588e19c7ad823749c08bd2bf",
+        "version" : "5.0.0"
+      }
+    },
+    {
+      "identity" : "yams",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jpsim/Yams",
+      "state" : {
+        "revision" : "51b5127c7fb6ffac106ad6d199aaa33c5024895f",
+        "version" : "6.2.0"
+      }
+    }
+  ],
+  "version" : 3
+}

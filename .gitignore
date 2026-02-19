@@ -3,3 +3,4 @@
 .swiftpm
 /end-to-end-openapi-postgres-hummingbird/example-openapi/.swift-openapi-generator/
 .vscode/launch.json
+.tmp*
