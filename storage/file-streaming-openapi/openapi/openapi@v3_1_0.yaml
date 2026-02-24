@@ -1,0 +1,80 @@
+openapi: 3.1.0
+info:
+  title: Dummy File Streaming API
+  description: Minimal example API for streaming upload/download.
+  version: 1.0.0
+tags:
+- name: FileStreaming
+servers:
+- url: https://api.example.com
+paths:
+  /upload:
+    put:
+      tags:
+      - FileStreaming
+      summary: Upload file as a chunked stream
+      operationId: streamUpload
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+              contentEncoding: binary
+            example: hello world
+        required: true
+      responses:
+        201:
+          description: Chunk accepted
+          headers:
+            Transfer-Encoding:
+              required: true
+              schema:
+                $ref: '#/components/schemas/TransferEncodingHeaderValueSchema'
+              description: Uses chunked transfer for streaming response data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  receivedBytes:
+                    type: integer
+                    default: null
+                    examples:
+                    - null
+                required:
+                - receivedBytes
+                minProperties: 1
+  /download:
+    get:
+      tags:
+      - FileStreaming
+      summary: Download file as a chunked stream
+      operationId: streamDownload
+      responses:
+        200:
+          description: Chunked stream response
+          headers:
+            Transfer-Encoding:
+              required: true
+              schema:
+                $ref: '#/components/schemas/TransferEncodingHeaderValueSchema'
+              description: Uses chunked transfer for streaming response data.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+                contentEncoding: binary
+components:
+  schemas:
+    TransferEncodingHeaderValueSchema:
+      type: string
+      const: chunked
+      default: null
+      examples:
+      - null
+  examples:
+    chunkSample:
+      summary: Single chunk payload example
+      value: hello world
