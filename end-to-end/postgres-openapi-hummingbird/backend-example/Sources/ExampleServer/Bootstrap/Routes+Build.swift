@@ -34,14 +34,13 @@ func buildRouter(
         Response(status: .ok)
     }
     
-    let controller = ExampleAPIController(
-        database: database
-    )
+    let repository = AppRepository(database: database)
+    let service = AppService(repository: repository)
+    let controller = ExampleAPIController(service: service)
     try controller.registerHandlers(
         on: router,
     )
     
     return router
 }
-
 
